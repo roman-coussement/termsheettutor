@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Term Sheet Tutor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16140d;
+  --paper:#fdfbf4;
+  --panel:#fffdf6;
+  --hl:#ffe24a;
+  --hl-soft:#fff2a8;
+  --rule:#16140d;
+  --muted:#7a756a;
+  --faint:#e7e2d4;
+  --tag:#2b2820;
+  --maxw:980px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Newsreader",Georgia,serif;
+  font-size:18px;
+  line-height:1.62;
+  font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+::selection{background:var(--hl);color:var(--ink)}
+
+/* ---------- layout shell ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+.masthead{border-bottom:3px double var(--rule);padding-top:34px;padding-bottom:18px;margin-bottom:0}
+.mh-top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px}
+.brand{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(34px,6vw,60px);line-height:.95;letter-spacing:-.02em}
+.brand .sub{display:block;font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+.mh-meta{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--muted);text-align:right;line-height:1.9}
+.mh-meta b{color:var(--ink);font-weight:600}
+
+/* nav */
+nav.tabs{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--rule);}
+nav.tabs .wrap{display:flex;flex-wrap:wrap;gap:0}
+nav.tabs a{
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;padding:14px 16px 12px;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s
+}
+nav.tabs a:first-child{padding-left:0}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a.active{color:var(--ink);border-bottom-color:var(--hl);box-shadow:inset 0 -3px 0 var(--hl)}
+
+main{padding:42px 0 90px;min-height:60vh}
+@media(max-width:620px){body{font-size:16px}.wrap{padding:0 18px}nav.tabs a{padding:12px 11px 10px}}
+
+/* ---------- shared typography ---------- */
+h1.page{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(28px,4.5vw,42px);line-height:1.05;letter-spacing:-.015em;margin-bottom:6px}
+.kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:block}
+h2.sec{font-family:"Fraunces",serif;font-weight:600;font-size:26px;letter-spacing:-.01em;margin:46px 0 14px;padding-bottom:6px;border-bottom:1px solid var(--faint)}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:20px;margin:26px 0 6px}
+p{margin:0 0 14px;max-width:68ch}
+a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;text-decoration-color:var(--hl)}
+a:hover{background:var(--hl-soft)}
+.hl{background:linear-gradient(180deg,transparent 8%,var(--hl) 8%,var(--hl) 86%,transparent 86%);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.lead{font-size:21px;line-height:1.55;color:#2c281f;max-width:64ch}
+.mono{font-family:"IBM Plex Mono",monospace}
+.muted{color:var(--muted)}
+em.term{font-style:normal;font-weight:600}
+
+/* term-sheet field rows */
+.tsblock{border:1px solid var(--rule);background:var(--panel);padding:22px 24px;margin:22px 0;box-shadow:4px 4px 0 var(--faint)}
+.tsblock .label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;background:var(--hl);display:inline-block;padding:3px 9px;margin-bottom:14px}
+.tsrow{display:grid;grid-template-columns:200px 1fr;gap:10px 20px;padding:8px 0;border-bottom:1px dotted #cfc9b8;align-items:baseline}
+.tsrow:last-child{border-bottom:0}
+.tsrow .k{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.tsrow .v{font-size:16.5px}
+@media(max-width:560px){.tsrow{grid-template-columns:1fr}.tsrow .k{margin-bottom:-4px}}
+
+/* ---------- home cards ---------- */
+.grid{display:grid;gap:18px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.navcard{display:block;border:1px solid var(--rule);background:var(--panel);padding:20px 22px;text-decoration:none;color:var(--ink);transition:transform .12s,box-shadow .12s;box-shadow:3px 3px 0 var(--faint)}
+.navcard:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--hl);background:var(--panel)}
+.navcard .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.2em}
+.navcard h3{margin:6px 0 4px}
+.navcard p{font-size:15px;color:var(--muted);margin:0;max-width:none}
+
+/* ---------- books ---------- */
+.bookrow{border:1px solid var(--rule);background:var(--panel);margin:16px 0;padding:22px 24px;box-shadow:3px 3px 0 var(--faint);transition:box-shadow .12s,transform .12s}
+.bookrow:hover{box-shadow:6px 6px 0 var(--hl);transform:translate(-2px,-2px)}
+.bookrow a.tt{font-family:"Fraunces",serif;font-weight:600;font-size:23px;text-decoration:none;letter-spacing:-.01em}
+.bookrow a.tt:hover{background:var(--hl-soft)}
+.bookrow .by{font-style:italic;color:var(--muted);font-size:16px}
+.bookrow .blurb{font-size:16px;margin-top:8px;color:#3a352b}
+.pill{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--rule);padding:3px 8px;display:inline-block}
+.pill.done{background:var(--hl)}
+.pill.queue{background:transparent;color:var(--muted);border-color:#cfc9b8}
+.chapnav{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 30px}
+.chapnav a{font-family:"IBM Plex Mono",monospace;font-size:11px;text-decoration:none;border:1px solid var(--faint);padding:5px 9px;color:var(--muted)}
+.chapnav a:hover{border-color:var(--rule);color:var(--ink);background:var(--hl-soft)}
+.chap{margin:0 0 30px;padding-top:8px}
+.chap .cn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+.chap h3{margin:2px 0 8px}
+.backlink{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--muted);display:inline-block;margin-bottom:8px}
+.backlink:hover{color:var(--ink);background:none}
+
+/* ---------- timeline ---------- */
+.era{font-family:"Fraunces",serif;font-weight:600;font-size:22px;margin:40px 0 4px;display:flex;align-items:baseline;gap:12px}
+.era .yrs{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.08em}
+.era-desc{color:var(--muted);font-size:15px;margin-bottom:10px;max-width:66ch}
+.tl{border-left:2px solid var(--rule);margin-left:8px}
+.tlitem{position:relative;padding:10px 0 10px 26px}
+.tlitem::before{content:"";position:absolute;left:-7px;top:18px;width:11px;height:11px;background:var(--paper);border:2px solid var(--rule)}
+.tlitem.mark::before{background:var(--hl)}
+.tlitem .yr{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;letter-spacing:.04em}
+.tlitem .tt{font-weight:600}
+.tlitem .ds{font-size:16px;color:#3a352b}
+.tlitem .ty{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #cfc9b8;padding:1px 6px;color:var(--muted);margin-left:6px;vertical-align:middle}
+.tlfilter{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 6px}
+.tlfilter button,.gfilter button,.rfilter button{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid #cfc9b8;color:var(--muted);padding:6px 12px;cursor:pointer}
+.tlfilter button.on,.gfilter button.on,.rfilter button.on{background:var(--hl);border-color:var(--rule);color:var(--ink)}
+
+/* ---------- glossary ---------- */
+.search{width:100%;font-family:"Newsreader",serif;font-size:18px;padding:12px 14px;border:1px solid var(--rule);background:var(--panel);margin:6px 0 4px}
+.search:focus{outline:2px solid var(--hl)}
+.gterm{border-bottom:1px solid var(--faint);padding:16px 0}
+.gterm .t{font-family:"Fraunces",serif;font-weight:600;font-size:19px}
+.gterm .cat{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #cfc9b8;padding:1px 6px;color:var(--muted);margin-left:8px;vertical-align:middle}
+.gterm .d{font-size:16.5px;margin-top:4px;color:#2c281f;max-width:72ch}
+.gcount{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.08em;margin:8px 0}
+
+/* ---------- rolodex ---------- */
+.rgrid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rcard{border:1px solid var(--rule);background:var(--panel);padding:18px 20px;box-shadow:3px 3px 0 var(--faint)}
+.rcard .nm{font-family:"Fraunces",serif;font-weight:600;font-size:19px;letter-spacing:-.01em}
+.rcard .rl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:3px 0 8px}
+.rcard .rl b{background:var(--hl);color:var(--ink);padding:1px 5px;font-weight:600}
+.rcard .wh{font-size:15px;color:#3a352b}
+.rcard .era{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin:0 0 0;display:block}
+
+/* ---------- flashcards ---------- */
+.fc-stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px}
+.stat{border:1px solid var(--rule);padding:10px 16px;background:var(--panel);min-width:90px}
+.stat .num{font-family:"Fraunces",serif;font-weight:600;font-size:26px;line-height:1}
+.stat .lb{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.deckpick{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 22px}
+.deckpick button{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid #cfc9b8;color:var(--muted);padding:8px 13px;cursor:pointer}
+.deckpick button.on{background:var(--hl);border-color:var(--rule);color:var(--ink)}
+.card-stage{max-width:560px;margin:14px auto 0;perspective:1600px}
+.flashcard{position:relative;min-height:280px;cursor:pointer;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.flashcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--rule);background:var(--panel);padding:34px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:5px 5px 0 var(--faint)}
+.face .side{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);position:absolute;top:16px;left:0;right:0}
+.face .deck{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);position:absolute;bottom:14px;left:0;right:0}
+.face .content{font-size:21px;line-height:1.4}
+.face .content.small{font-size:17px;line-height:1.5}
+.back{transform:rotateY(180deg);background:#fffef8}
+.face .hint{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--muted);position:absolute;bottom:32px}
+.grade{display:flex;gap:12px;justify-content:center;margin:22px auto 0;max-width:560px}
+.grade button{flex:1;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:14px;border:1px solid var(--rule);cursor:pointer;background:var(--panel)}
+.grade .miss:hover{background:#ffd9d2}
+.grade .got:hover{background:var(--hl)}
+.progress{height:4px;background:var(--faint);margin:0 auto 16px;max-width:560px}
+.progress .bar{height:100%;background:var(--hl);transition:width .3s}
+.fc-done{max-width:560px;margin:24px auto;text-align:center;border:1px solid var(--rule);background:var(--panel);padding:40px 30px;box-shadow:5px 5px 0 var(--faint)}
+.btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--rule);background:var(--panel);padding:10px 16px;cursor:pointer;text-decoration:none;color:var(--ink);display:inline-block}
+.btn:hover{background:var(--hl)}
+.btn.ghost{border-color:#cfc9b8;color:var(--muted)}
+.note{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.04em;border-left:2px solid var(--hl);padding:6px 0 6px 12px;margin:18px 0;max-width:70ch;line-height:1.7}
+
+.eranav{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 8px}
+.eranav button{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;background:transparent;border:1px solid #cfc9b8;color:var(--muted);padding:6px 10px;cursor:pointer}
+.eranav button:hover{border-color:var(--rule);color:var(--ink);background:var(--hl-soft)}
+.tlitem.target{background:var(--hl-soft);box-shadow:-6px 0 0 var(--hl-soft)}
+.xrow{margin-top:11px;display:flex;flex-wrap:wrap;gap:14px}
+.xlink{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.04em;text-decoration:none;color:var(--muted);border-bottom:1px solid var(--hl);cursor:pointer;padding-bottom:1px}
+.xlink:hover{color:var(--ink);background:var(--hl-soft)}
+.studydeck{margin:24px 0 4px}
+.modetoggle{display:inline-flex;border:1px solid var(--rule);margin:4px 0 18px}
+.modetoggle button{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:0;border-right:1px solid var(--rule);color:var(--muted);padding:9px 18px;cursor:pointer}
+.modetoggle button:last-child{border-right:0}
+.modetoggle button.on{background:var(--hl);color:var(--ink)}
+.browse{margin-top:6px}
+.browse-deckhdr{font-family:"Fraunces",serif;font-weight:600;font-size:19px;margin:24px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--faint)}
+.bcard{border:1px solid var(--faint);border-left:3px solid var(--hl);background:var(--panel);padding:14px 17px;margin:10px 0}
+.bcard .bq{font-family:"Fraunces",serif;font-weight:600;font-size:17px;line-height:1.3}
+.bcard .ba{font-size:16px;color:#2c281f;margin-top:5px}
+.bcard .bm{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:9px}
+footer{border-top:3px double var(--rule);padding:22px 0 50px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap">
+  <div class="mh-top">
+    <div class="brand">Term Sheet Tutor<span class="sub">A Self-Guided Primer on How Venture Capital Works</span></div>
+    <div class="mh-meta">
+      <div>RE: <b>How Startup Financing Works</b></div>
+      <div>TOPICS: <b>Deals · Funds · Founders · History</b></div>
+      <div>STATUS: <b>Non-binding · For Study</b></div>
+    </div>
+  </div>
+</div></header>
+<nav class="tabs"><div class="wrap" id="tabs"></div></nav>
+<main><div class="wrap" id="view"></div></main>
+<footer><div class="wrap">
+  <span>Term Sheet Tutor — a self-paced primer on venture capital</span>
+  <span>Original summaries · sources listed in Books</span>
+</div></footer>
+
+<script>var DATA={books:[],chapters:{},flashcards:[],glossary:[],timeline:[],people:[]};</script>
+<script>
+DATA.books = [
+  {slug:"venture-deals", title:"Venture Deals", author:"Brad Feld & Jason Mendelson", year:"2019 · 4th ed.", role:"Term-Sheet Mechanics", status:"done",
+   blurb:"The operator's manual for the financing itself: every term, every player, every negotiation lever — read through the entrepreneur's eyes, not the lawyer's.",
+   summary:"Feld and Mendelson reduce the entire venture financing to two questions: <span class='hl'>economics</span> (who makes how much money in an exit) and <span class='hl'>control</span> (who gets to decide what). Everything else on a term sheet is secondary, and most founders lose by over-negotiating trivial terms while conceding the two that matter. The book is deliberately written from the entrepreneur's side of the table, on the theory that an informed counterparty produces better, faster, more durable deals — and that VCs behave the way they do because of their own fund economics (fees, carry, reserves, fund cycle), so understanding the VC's incentives is the real source of negotiating leverage. It walks the full arc: the players and their motivations, how to actually run a raise and create competition, a term-by-term dissection of the priced equity term sheet, the alternatives (convertible debt, SAFEs, venture debt, crowdfunding), the cap table math, how funds work internally, negotiation tactics, and the legal scaffolding (Delaware C-corp, 83(b), 409A). Its through-line: build real relationships, don't be a jerk because reputation compounds across a small industry, and never let a strong valuation distract you from a control structure you'll regret."},
+  {slug:"sand-hill", title:"Secrets of Sand Hill Road", author:"Scott Kupor", year:"2019", role:"VC ↔ Founder Lifecycle", status:"done", sectionTitle:"Key Ideas", unitLabel:"Idea",
+   blurb:"The a16z managing partner's view of why VC behaves as it does — LP pressure, power-law math, and what founders should actually ask for.",
+   summary:"Scott Kupor, managing partner at Andreessen Horowitz, writes the definitive founder-facing explanation of <span class='hl'>why venture capitalists behave the way they do</span>. His central move is to expose the incentive structure underneath that behavior: VCs answer to their own investors (LPs), and the brutal math of the power law — where one or two investments must return an entire fund — forces them to need every company to have a shot at being enormous. That single fact explains the push for big markets, ownership targets, and relentless growth. The book walks founders through the full life cycle: what VC actually is (including the asset class's uncomfortable performance reality), how LPs and GPs are bound together by the LPA, how early-stage investors really decide (people, product, market), the economics and governance halves of a term sheet, and the parts founders rarely see — board fiduciary duties, the In re Trados cautionary tale on common-versus-preferred conflicts, surviving down rounds, and engineering exits. Its through-line: understand the constraints and incentives on the other side of the table, and you will negotiate and partner far better."},
+  {slug:"business-of-vc", title:"The Business of Venture Capital", author:"Mahendra Ramsinghani", year:"2020 · 3rd ed.", role:"Fund Formation & GP–LP", status:"done", sectionTitle:"Core Themes", unitLabel:"Theme",
+   blurb:"The densest of the five: raising the fund, LP due diligence, portfolio construction, and the practitioner's craft of being a GP.",
+   summary:"Mahendra Ramsinghani's book is the practitioner's manual for the <span class='hl'>fund side</span> — the one canonical text written for the person who wants to be (or work for) a GP rather than raise money from one. It is organized in two parts. The first, raising the venture fund, is its distinctive contribution: the universe of limited partners and where their capital comes from, how LPs actually diligence and select fund managers in their hunt for the elusive top-quartile performer, the terms of the limited partnership agreement and PPM, fund structure, governance and economics, and the grind of getting to a first close — including the role of placement agents and the all-important anchor lead LP, the ‘nut.’ The second part covers the craft of investing: sourcing through networks, conducting diligence on the ‘jockey, horse, and market,’ valuation methods, structuring transactions to hit target returns, serving effectively on boards, and engineering exits. Throughout, it frames venture as a small, deliberately non-scalable, home-run-driven business in which only a thin top slice of firms consistently performs."},
+  {slug:"breaking-in", title:"Breaking into Venture", author:"Allison Baum Gates", year:"2023", role:"Career & Positioning", status:"done", sectionTitle:"The Nine Principles", unitLabel:"Principle",
+   blurb:"Nine principles for entering and surviving the industry — networks over knowledge, thesis as foundation, managing your blind spots.",
+   summary:"Allison Baum Gates reframes entering venture capital as a problem of <span class='hl'>positioning and judgment, not credentials</span>. Built around nine principles in three movements — Access, Analyze, and Add Value — it argues that the job is fundamentally about people and pattern recognition under uncertainty. The first movement holds that your network is a more valuable asset than any body of knowledge, and that a clear, differentiated investment thesis is the foundation everything else rests on. The second turns analytical: timing usually matters more than being directionally right, you must actually understand the money, and your hard-won pattern recognition is also your bias to be managed. The third turns to leverage: lean into what makes you different rather than imitating incumbents, concentrate your follow-on attention on the winners, and stay in the game long enough across fund cycles for the power law to pay off. It is the most explicitly career- and self-positioning-oriented book of the five."},
+  {slug:"american-history", title:"VC: An American History", author:"Tom Nicholas", year:"2019", role:"Industry History", status:"done", sectionTitle:"Key Arguments", unitLabel:"Argument",
+   blurb:"The scholarly spine: from 19th-century whaling syndicates to the dot-com bubble, the structural origins of the power-law business.",
+   summary:"Tom Nicholas, a Harvard Business School historian, supplies the scholarly backbone for understanding why venture capital looks the way it does. His central argument is structural: the defining feature of VC — <span class='hl'>extreme, skewed, power-law returns financed by pooled, patient, high-risk capital</span> — is not a Silicon Valley invention but a pattern already visible in 19th-century New England whaling, where agents pooled investor capital across long, dangerous voyages with a few enormous payoffs. From there he traces the institutionalization of risk capital: wealthy families and the first firms, the formative role of ARDC and Georges Doriot, the contest between market and government provision of risk capital, the pivotal innovation of the limited partnership structure, the agglomeration of talent and money in Silicon Valley, the evolving 1980s ecosystem, and the great late-1990s bubble. A recurring, sober thread asks whether VC's aggregate returns actually justify its risk — and how much of the industry's success is durable structure versus luck and timing. Because this book supplies the chronology, the site's Timeline carries its events; the summary and arguments here distill what the history means."}
+];
+
+DATA.chapters["venture-deals"] = [
+  {n:"Intro", title:"The Art of the Term Sheet", body:"Sets the book's premise: the term sheet is the single document that defines the relationship between founder and investor, yet most entrepreneurs sign one without understanding it. The authors frame their goal as leveling the information asymmetry — a founder who knows the terms as well as the VC negotiates a fairer, faster deal and avoids the handful of provisions that genuinely hurt later."},
+  {n:"1", title:"The Players", body:"Maps everyone at the table and their incentives. On the VC side, the hierarchy runs from analyst and associate (sourcing, diligence, no decision power) up through principal to managing director / general partner (writes checks, takes board seats), plus the EIR and venture partner. The chapter distinguishes angels, the syndicate (a <span class='hl'>lead</span> investor who sets terms and price versus followers who take them), and the supporting cast — lawyer, accountant, banker, mentor. Core lesson: every party acts on its own economics, and recognizing those motivations is the foundation for everything that follows."},
+  {n:"2", title:"Preparing for Fundraising", body:"Get the house in order before pitching. Hire a startup-experienced lawyer (not a generalist), because deal fluency saves money and credibility. Be proactive rather than reactive — incorporate cleanly, and above all secure intellectual property: every founder and contractor must have assigned IP to the company, with no contamination from prior employers, or a diligence process will stall the round."},
+  {n:"3", title:"How to Raise Money", body:"Treat fundraising as a disciplined process, not a hopeful broadcast. Decide how much to raise based on hitting a meaningful milestone (typically 12–18 months of runway), build a tight deck rather than a long business plan, and reach VCs through warm introductions. Find a credible <span class='hl'>lead</span> who will price and anchor the round, and run multiple conversations in parallel to create genuine competition — the single biggest driver of better terms."},
+  {n:"4", title:"Overview of the Term Sheet", body:"Introduces the organizing frame for the rest of the book: every provision serves either <span class='hl'>economics</span> or <span class='hl'>control</span>. The term sheet itself is mostly non-binding — an expression of intent — with the notable binding exceptions of the no-shop / exclusivity clause and confidentiality. Founders should spend their negotiating capital on the economic and control terms that compound, not on boilerplate."},
+  {n:"5", title:"Economic Terms of the Term Sheet", body:"The money mechanics. Valuation splits into <span class='hl'>pre-money</span> and post-money; the <span class='hl'>option pool shuffle</span> is the classic trap, where a newly created pool is carved out of the pre-money valuation so founders, not investors, absorb the dilution. Liquidation preference defines who gets paid first and how much — <span class='hl'>1x non-participating</span> is the clean market standard, while participating preferred ('double dip') lets the investor take its money back and share the rest. The chapter also covers pay-to-play, vesting (typically four years with a one-year cliff), and anti-dilution protection (founder-friendly broad-based weighted average versus punitive full ratchet)."},
+  {n:"6", title:"Control Terms of the Term Sheet", body:"Control is as decisive as economics and routinely undervalued by founders chasing headline valuation. The key levers are board composition (who holds the seats and therefore the votes), <span class='hl'>protective provisions</span> (investor veto rights over actions like selling the company, raising new money, or changing the charter), drag-along rights (forcing minority holders to go along with a sale), and conversion. A founder can win on price and still lose the company through a board and veto structure that constrains every major decision."},
+  {n:"7", title:"Other Terms of the Term Sheet", body:"The long tail of provisions that matter less but still get negotiated: dividends, redemption rights, conditions to closing, information rights, registration rights, right of first refusal and co-sale, voting rights, assignment, and the binding no-shop and confidentiality clauses. Most are standardized and not worth heavy negotiation; the advice is to recognize which are truly market and not burn goodwill fighting boilerplate."},
+  {n:"8", title:"Convertible Debt", body:"Explains the early-stage alternative to a priced round: a note that converts to equity at the next financing. The economically decisive term is the <span class='hl'>valuation cap</span>, with the discount and interest rate secondary. The chapter weighs whether convertible debt is truly founder-friendly (it defers the valuation fight but can create messy outcomes and misaligned incentives) and introduces the SAFE as a simplified, debt-free variant."},
+  {n:"9", title:"The Capitalization Table", body:"Teaches founders to model ownership and dilution across rounds — how option pools, new preferred issuances, and conversion interact, and how the liquidation waterfall actually pays out at exit. The point is fluency: a founder who can build and read a cap table negotiates from understanding rather than fear."},
+  {n:"10", title:"Crowdfunding", body:"Distinguishes product/reward crowdfunding (Kickstarter-style pre-sales, no equity) from equity crowdfunding enabled by the JOBS Act (Reg CF and Reg A+). Covers the appeal — capital plus customer validation and marketing — against the real costs of managing a large, unsophisticated shareholder base and the regulatory overhead."},
+  {n:"11", title:"Venture Debt", body:"Debt extended to venture-backed companies, usually alongside or after an equity round, often carrying warrants and covenants. It can extend runway and reduce dilution between rounds, but it sits senior to equity and adds repayment risk — dangerous if the next round slips. The chapter frames when it helps and when it accelerates failure."},
+  {n:"12", title:"How Venture Capital Funds Work", body:"The chapter most founders skip and shouldn't. A fund is a partnership of GPs and LPs running roughly a ten-year life, paying the GP a ~2% annual management fee and ~20% carried interest on profits above returned capital. Fund size, reserve strategy for follow-ons, the investment period, and where the GP sits in the fund cycle all shape how a VC behaves toward your company — making this the real key to negotiating leverage."},
+  {n:"13", title:"Negotiation Tactics", body:"Concentrate on the terms that matter (economics and control) and let the rest go. Leverage comes from having alternatives — a competitive process — not from posturing. The authors catalog good and bad behavior on both sides, warn against negotiating styles that poison the long relationship, and argue for transparent, win-win deals because the parties will sit on the same side of the table for years."},
+  {n:"14", title:"Raising Money the Right Way", body:"A behavioral chapter: reputation is the most valuable asset in a small, long-memoried industry. It lists the common ways founders sabotage themselves — misrepresentation, shopping signed term sheets, poor follow-through — and reframes fundraising as the start of a multi-year partnership rather than a transaction to win."},
+  {n:"15", title:"Issues at Different Financing Stages", body:"Terms and dynamics shift by stage. Seed rounds are lighter, faster, and often note/SAFE-based; Series A introduces the full control apparatus; later rounds add complexity around stacked preferences, pro rata, and the interests of earlier investors. What is standard at one stage can be aggressive at another."},
+  {n:"16", title:"Letters of Intent: The Other Term Sheet", body:"The acquisition analog to a financing term sheet. An M&A letter of intent covers price and structure (cash versus stock), escrows and holdbacks, reps and warranties, indemnification, and a no-shop. Mostly non-binding except exclusivity — and, like a financing term sheet, the unglamorous terms (escrow, indemnity caps) often decide how much money the seller actually keeps."},
+  {n:"17", title:"How to Engage an Investment Banker", body:"When and how to bring in a banker to sell the company: the value they add (process, competitive tension, access to buyers), how engagement letters and fee structures work, and how to manage the relationship so the banker's incentives stay aligned with a good outcome rather than just any outcome."},
+  {n:"18", title:"Why Do Term Sheets Even Exist?", body:"A step back into the function of the document itself. Standardized terms exist to manage agency problems and signaling between parties who don't fully trust each other, to allocate risk, and to create a shared reference point. The chapter argues the legal scaffolding ultimately serves the relationship, not the reverse."},
+  {n:"19", title:"Legal Things Every Entrepreneur Should Know", body:"The legal hygiene founders ignore at their peril: incorporate as a Delaware C-corp for venture compatibility, file an <span class='hl'>83(b) election</span> within 30 days of receiving restricted stock to avoid a punishing tax outcome, get a 409A valuation to price options defensibly, and stay clean on employment and IP law. Cheap to do right early, expensive to fix later."}
+];
+</script>
+<script>
+// rev:true => engine also generates a definition->term reverse card
+DATA.flashcards = [
+ {deck:"venture-deals", front:"Pre-money valuation", back:"The agreed value of the company before the new investment goes in. Add the round size to get post-money.", rev:true},
+ {deck:"venture-deals", front:"Post-money valuation", back:"Pre-money valuation plus the new money raised; the investor's ownership % = check size ÷ post-money.", rev:true},
+ {deck:"venture-deals", front:"Option pool shuffle", back:"Creating or expanding the employee option pool out of the PRE-money valuation, so founders — not the new investor — absorb the dilution. A key negotiation point.", rev:true},
+ {deck:"venture-deals", front:"Liquidation preference", back:"The right of preferred holders to be paid first (and how much) before common in a sale or wind-down. Two parts: the multiple and whether it participates.", rev:true},
+ {deck:"venture-deals", front:"1x non-participating preferred", back:"The clean market-standard preference: investor takes either its money back (1x) OR converts to common and shares pro rata — whichever is greater, but not both.", rev:true},
+ {deck:"venture-deals", front:"Participating preferred (\u201cdouble dip\u201d)", back:"Investor gets its preference back FIRST, then also shares in the remaining proceeds as if converted to common. Investor-favorable; resist or cap it.", rev:true},
+ {deck:"venture-deals", front:"Weighted-average anti-dilution", back:"On a down round, adjusts the investor's conversion price using a formula that accounts for the size and price of the new issuance. The founder-friendly, market norm.", rev:true},
+ {deck:"venture-deals", front:"Full ratchet anti-dilution", back:"Repprices ALL of the investor's prior shares to the new lower price on a down round, regardless of how few new shares are issued. Punitive to founders/common.", rev:true},
+ {deck:"venture-deals", front:"Pay-to-play", back:"Provision requiring investors to participate pro rata in future rounds or lose preferred rights (often forced conversion to common). Aligns investors in hard times.", rev:true},
+ {deck:"venture-deals", front:"Vesting cliff", back:"A period (typically one year) before any equity vests; leave before the cliff and you get nothing. Standard founder/employee schedule is 4 years with a 1-year cliff.", rev:true},
+ {deck:"venture-deals", front:"Double-trigger acceleration", back:"Unvested equity accelerates only if BOTH a change of control AND a termination occur. The market-standard, balanced form (vs. single-trigger on acquisition alone).", rev:true},
+ {deck:"venture-deals", front:"Protective provisions", back:"Investor veto rights over specified major actions — selling the company, issuing senior stock, changing the charter, taking on debt above a threshold. A core CONTROL term.", rev:true},
+ {deck:"venture-deals", front:"Drag-along rights", back:"Lets a defined majority force minority shareholders to vote for and join an approved sale of the company, preventing holdouts from blocking an exit.", rev:true},
+ {deck:"venture-deals", front:"Right of first refusal (ROFR)", back:"The company's/investors' right to buy shares a holder wants to sell, on the same terms, before they go to an outside buyer.", rev:true},
+ {deck:"venture-deals", front:"Co-sale (tag-along) right", back:"Lets investors sell a proportional amount of their shares alongside a founder who is selling, so founders can't cash out while investors are stuck.", rev:true},
+ {deck:"venture-deals", front:"No-shop / exclusivity", back:"One of the few BINDING term-sheet clauses: bars the company from soliciting competing offers for a set period (often ~30 days) while the deal closes.", rev:true},
+ {deck:"venture-deals", front:"Pro rata rights", back:"The investor's right (not obligation) to invest in future rounds to maintain its ownership percentage. Valuable for backing winners.", rev:true},
+ {deck:"venture-deals", front:"Convertible note", back:"Short-term debt that converts into equity at the next priced round, usually with a discount and/or valuation cap. Defers the valuation negotiation.", rev:true},
+ {deck:"venture-deals", front:"Valuation cap", back:"The maximum valuation at which a convertible note/SAFE converts — the single most economically important term, protecting early investors if the next round prices high.", rev:true},
+ {deck:"venture-deals", front:"SAFE", back:"Simple Agreement for Future Equity: a convertible instrument that is NOT debt (no interest, no maturity), converting to equity at a future priced round. Y Combinator standard.", rev:true},
+ {deck:"venture-deals", front:"Conversion discount (notes)", back:"The percentage reduction (e.g., 20%) off the next round's price at which a convertible note converts, rewarding early risk.", rev:true},
+ {deck:"venture-deals", front:"Capitalization table", back:"The ledger of who owns what — shares, options, and convertibles by class — used to model ownership and the exit payout waterfall across rounds.", rev:true},
+ {deck:"venture-deals", front:"Management fee", back:"The annual fee LPs pay the GP to operate the fund, typically ~2% of committed capital, covering salaries and operations (not the GP's upside).", rev:true},
+ {deck:"venture-deals", front:"Carried interest (carry)", back:"The GP's share of fund profits, typically ~20%, earned only after returning LP capital. The primary engine of VC wealth.", rev:true},
+ {deck:"venture-deals", front:"Venture debt", back:"Loans to venture-backed companies, often with warrants and covenants, used to extend runway with less dilution — but senior to equity and risky if the next round slips.", rev:true},
+ {deck:"venture-deals", front:"83(b) election", back:"A tax filing made within 30 days of receiving restricted stock, electing to be taxed on its (low) value now rather than as it vests — critical for founders.", rev:true},
+ {deck:"venture-deals", front:"409A valuation", back:"An independent appraisal of a private company's common stock used to set a defensible option strike price and avoid IRS penalties.", rev:true},
+ {deck:"venture-deals", front:"Lead investor", back:"The investor who negotiates and sets the terms and price of a round and usually takes the board seat; others in the syndicate follow on those terms.", rev:true},
+ {deck:"venture-deals", front:"Redemption rights", back:"Investor right to force the company to buy back its shares after some period — rarely exercised, but a pressure lever; resist aggressive versions.", rev:true},
+ {deck:"venture-deals", front:"The two governing questions of any term sheet", back:"Economics (who makes how much in an exit) and control (who gets to decide). Every provision serves one or the other.", rev:false},
+ {deck:"venture-deals", front:"Why study how a VC fund works before negotiating?", back:"Because a GP's behavior — reserves, fund cycle stage, fees, and carry — drives how they treat your company. Understanding their economics is the real source of leverage.", rev:false},
+ {deck:"venture-deals", front:"The most common self-inflicted founder error (Feld & Mendelson)", back:"Fixating on headline valuation while conceding control terms, and burning capital negotiating trivial boilerplate.", rev:false}
+];
+</script>
+<script>
+DATA.glossary = [
+ {t:"Term sheet", c:"Process", d:"A mostly non-binding summary of the key terms of a proposed financing, organized around economics and control. The binding exceptions are typically the no-shop and confidentiality clauses."},
+ {t:"Pre-money valuation", c:"Deal Terms", d:"The company's agreed value before new investment. Pre-money + round size = post-money."},
+ {t:"Post-money valuation", c:"Deal Terms", d:"Pre-money valuation plus new money in. Determines the investor's ownership percentage."},
+ {t:"Liquidation preference", c:"Deal Terms", d:"The order and amount preferred holders are paid before common in an exit. Defined by a multiple and whether it participates."},
+ {t:"Participating preferred", c:"Deal Terms", d:"Preferred that takes its preference back AND shares in remaining proceeds (\u201cdouble dip\u201d). Investor-favorable."},
+ {t:"Non-participating preferred", c:"Deal Terms", d:"Preferred that takes the GREATER of its preference or its as-converted common share — not both. Market standard at 1x."},
+ {t:"Anti-dilution protection", c:"Deal Terms", d:"Adjusts a preferred holder's conversion price after a down round. Weighted-average is standard; full ratchet is punitive."},
+ {t:"Full ratchet", c:"Deal Terms", d:"The harshest anti-dilution: reprices all prior preferred to the new lower price regardless of issuance size."},
+ {t:"Pay-to-play", c:"Deal Terms", d:"Requires investors to keep investing pro rata or lose preferred rights, often via forced conversion to common."},
+ {t:"Option pool", c:"Deal Terms", d:"Shares reserved for employee equity (ESOP). When created from the pre-money, founders bear the dilution — the \u201coption pool shuffle.\u201d"},
+ {t:"Protective provisions", c:"Deal Terms", d:"Investor veto rights over major corporate actions (sale, new senior stock, charter changes). A core control term."},
+ {t:"Drag-along right", c:"Deal Terms", d:"Lets a defined majority force minority holders to join an approved company sale."},
+ {t:"Co-sale / tag-along", c:"Deal Terms", d:"Lets investors sell proportionally alongside a selling founder."},
+ {t:"Right of first refusal", c:"Deal Terms", d:"The right to buy shares a holder intends to sell, on the same terms, before an outsider can."},
+ {t:"No-shop / exclusivity", c:"Deal Terms", d:"A binding clause barring the company from soliciting competing offers for a set window during closing."},
+ {t:"Pro rata rights", c:"Deal Terms", d:"The investor's right to invest in future rounds to maintain its ownership percentage."},
+ {t:"Vesting", c:"Deal Terms", d:"Earning equity over time, typically four years. Protects the company if a founder or employee leaves early."},
+ {t:"Cliff", c:"Deal Terms", d:"An initial period (usually one year) before any equity vests at all."},
+ {t:"Acceleration (single/double trigger)", c:"Deal Terms", d:"When unvested equity vests early. Single trigger = on acquisition; double trigger = acquisition plus termination (the market norm)."},
+ {t:"Redemption rights", c:"Deal Terms", d:"Investor right to force the company to repurchase shares after a set period."},
+ {t:"Registration rights", c:"Deal Terms", d:"Rights compelling the company to register investors' shares for public sale (demand and piggyback)."},
+ {t:"Convertible note", c:"Securities", d:"Short-term debt that converts to equity at the next priced round, usually with a discount and/or cap."},
+ {t:"SAFE", c:"Securities", d:"Simple Agreement for Future Equity — a non-debt convertible instrument (no interest or maturity). Y Combinator standard."},
+ {t:"Valuation cap", c:"Securities", d:"The maximum conversion valuation on a note/SAFE; usually its most important economic term."},
+ {t:"Conversion discount", c:"Securities", d:"A percentage discount off the next round's price at which a note converts."},
+ {t:"Preferred stock", c:"Securities", d:"The share class VCs buy, carrying preferences and protective rights over common."},
+ {t:"Common stock", c:"Securities", d:"The basic equity held by founders and employees, junior to preferred in a waterfall."},
+ {t:"Warrant", c:"Securities", d:"A right to buy shares at a set price later; common in venture debt deals."},
+ {t:"Venture debt", c:"Securities", d:"Loans to venture-backed startups, often with warrants and covenants, used to extend runway with less dilution."},
+ {t:"Capitalization table", c:"Process", d:"The record of all equity ownership by class, used to model dilution and the exit waterfall."},
+ {t:"Liquidation waterfall", c:"Process", d:"The order in which sale proceeds are distributed across preference stacks and common."},
+ {t:"Lead investor", c:"Process", d:"The investor who sets a round's price and terms and usually takes a board seat; others follow."},
+ {t:"Syndicate", c:"Process", d:"The group of investors in a round — one lead plus followers."},
+ {t:"Down round", c:"Process", d:"A financing at a lower valuation than the prior round, triggering anti-dilution adjustments."},
+ {t:"Bridge financing", c:"Process", d:"Interim capital, often a note, to reach the next priced round or milestone."},
+ {t:"Burn rate / runway", c:"Process", d:"Burn is monthly net cash consumption; runway is months of cash remaining at that burn."},
+ {t:"83(b) election", c:"Process", d:"A tax filing within 30 days of receiving restricted stock to be taxed on its low current value, not at vesting."},
+ {t:"409A valuation", c:"Process", d:"An independent appraisal of common stock setting a defensible option strike price."},
+ {t:"General Partner (GP)", c:"Fund Economics", d:"The fund manager who sources, decides, and manages investments, earning carry and fees."},
+ {t:"Limited Partner (LP)", c:"Fund Economics", d:"The fund's investors — pensions, endowments, foundations, family offices, funds-of-funds — who provide capital but don't manage it."},
+ {t:"Limited Partnership Agreement (LPA)", c:"Fund Economics", d:"The contract governing the GP–LP relationship: fees, carry, term, restrictions, governance."},
+ {t:"Management fee", c:"Fund Economics", d:"Annual fee (~2% of committed capital) funding fund operations, independent of performance."},
+ {t:"Carried interest", c:"Fund Economics", d:"The GP's profit share (~20%) earned after returning LP capital; the main source of VC wealth."},
+ {t:"Capital call", c:"Fund Economics", d:"A GP's drawdown of committed LP capital as it is needed for investments and fees."},
+ {t:"Dry powder", c:"Fund Economics", d:"Committed but uncalled/undeployed capital available to invest."},
+ {t:"Reserves", c:"Fund Economics", d:"Capital a GP holds back from the initial check to fund follow-on investments in winners."},
+ {t:"Recycling", c:"Fund Economics", d:"Reinvesting early proceeds or fees to deploy more than committed capital, boosting returns."},
+ {t:"Clawback", c:"Fund Economics", d:"An LPA mechanism forcing the GP to return excess carry if later losses leave LPs underpaid."},
+ {t:"Vintage year", c:"Performance Metrics", d:"The year a fund makes its first investments; used to benchmark funds against peers of the same era."},
+ {t:"J-curve", c:"Performance Metrics", d:"The early dip then rise in fund returns, as fees and write-downs precede maturing winners."},
+ {t:"DPI", c:"Performance Metrics", d:"Distributions to Paid-In — realized cash returned to LPs relative to capital called. The cash-in-hand measure."},
+ {t:"TVPI", c:"Performance Metrics", d:"Total Value to Paid-In — realized plus unrealized value over capital called. Includes paper marks."},
+ {t:"IRR", c:"Performance Metrics", d:"Internal rate of return — the time-weighted annualized return, sensitive to timing of cash flows."},
+ {t:"MOIC", c:"Performance Metrics", d:"Multiple on Invested Capital — gross multiple returned, ignoring time."},
+ {t:"Power law", c:"Performance Metrics", d:"The core return dynamic: a tiny number of investments drive nearly all of a fund's returns."},
+ {t:"Unicorn", c:"Performance Metrics", d:"A private company valued at $1B+. Term coined by Aileen Lee in 2013."}
+];
+</script>
+<script>
+DATA.timeline = [
+ {era:"Merchant & Whaling Capital", yrs:"1700s\u20131890s", desc:"Nicholas's central thesis: the structural DNA of venture capital predates Silicon Valley. Whaling voyages were long-duration, high-risk, power-law bets pooled by agents who took a share of profits.", items:[
+   {y:"1700s\u20131800s", t:"Whaling voyages as proto-venture", d:"New England agents pool capital from many investors for risky, multi-year whaling expeditions with power-law returns \u2014 the structural ancestor of the VC fund.", ty:"Milestone", mark:true},
+   {y:"1820s\u201350s", t:"New Bedford whaling boom", d:"Agents managing voyages earn a share of the catch \u2014 an early analog of carried interest and the GP role.", ty:"Milestone"},
+   {y:"1860s\u201390s", t:"Industrial family fortunes", d:"Railroad, textile, and steel wealth becomes a private pool of risk capital for new ventures.", ty:"Milestone"}
+ ]},
+ {era:"The Birth of Risk Capital", yrs:"1900\u20131945", desc:"Wealthy families and merchant bankers fund early technology, while reformers argue science needs dedicated institutional capital.", items:[
+   {y:"1911", t:"Family-office venture bets", d:"Vanderbilt, Whitney, and Rockefeller money backs aviation, radio, and other emerging industries.", ty:"Deal"},
+   {y:"1920s", t:"Merchant banking funds industry", d:"Morgan-era finance channels capital into new industrial enterprises.", ty:"Milestone"},
+   {y:"1938", t:"Call for institutional risk capital", d:"MIT's Karl Compton and allies argue New England must fund the commercialization of science systematically.", ty:"Milestone"}
+ ]},
+ {era:"Institutional VC Forms", yrs:"1946\u20131969", desc:"The first professional firms appear, the limited-partnership template emerges, and a single legendary return proves the model works.", items:[
+   {y:"1946", t:"ARDC founded", id:"ardc", d:"Georges Doriot, Ralph Flanders, and Karl Compton launch American Research and Development Corp \u2014 the first institutional, professionally managed VC firm.", ty:"Firm", mark:true},
+   {y:"1946", t:"Whitney & Rockefeller enter", d:"J.H. Whitney & Co. and the Rockefeller family (later Venrock) begin organized venture investing.", ty:"Firm"},
+   {y:"1957", t:"ARDC invests in DEC", d:"A ~$70,000 stake in Digital Equipment Corporation becomes the most famous venture investment in history.", ty:"Deal", mark:true},
+   {y:"1957", t:"Fairchild Semiconductor", id:"fairchild", d:"The \u201cTraitorous Eight\u201d leave Shockley and found Fairchild, backed by Fairchild Camera \u2014 the genetic seed of Silicon Valley.", ty:"Co", mark:true},
+   {y:"1958", t:"SBIC Act", d:"Federal legislation licenses and leverages private investment companies, training a generation of venture investors.", ty:"Reg", mark:true},
+   {y:"1959", t:"Draper, Gaither & Anderson", d:"One of the first West Coast venture partnerships forms.", ty:"Firm"},
+   {y:"1961", t:"Davis & Rock", id:"davis-rock", d:"Arthur Rock and Tommy Davis pioneer the VC limited-partnership structure on the West Coast.", ty:"Fund", mark:true},
+   {y:"1968", t:"Rock backs Intel", d:"Arthur Rock finances Robert Noyce and Gordon Moore's new chip company.", ty:"Deal", mark:true}
+ ]},
+ {era:"The Limited Partnership & Sand Hill Era", yrs:"1970s", desc:"The modern firm template crystallizes on Sand Hill Road, and two regulatory changes flip the capital supply from trickle to flood.", items:[
+   {y:"1971", t:"DEC return realized", d:"ARDC's DEC stake compounds into hundreds of millions \u2014 a ~500x outcome that proves the venture model's power-law logic.", ty:"Exit", mark:true},
+   {y:"1971", t:"\u201cSilicon Valley\u201d coined", d:"Journalist Don Hoefler names the region; Intel goes public.", ty:"Milestone"},
+   {y:"1972", t:"Kleiner Perkins & Sequoia found", id:"kp-sequoia", d:"Eugene Kleiner and Tom Perkins, and separately Don Valentine, establish the firms that will define the industry.", ty:"Firm", mark:true},
+   {y:"1973", t:"NVCA founded", d:"The National Venture Capital Association forms as the industry's trade body.", ty:"Milestone"},
+   {y:"1974", t:"ERISA chills the asset class", d:"Pension-fund investment restrictions cut off a key capital source, starving venture of LP money.", ty:"Reg"},
+   {y:"1976", t:"KP backs Genentech", d:"Kleiner Perkins seeds Genentech, helping create the biotech venture category.", ty:"Deal", mark:true},
+   {y:"1977", t:"Apple funded", id:"apple", d:"Mike Markkula and Sequoia back Apple Computer.", ty:"Deal"},
+   {y:"1978", t:"Capital-gains tax cut", d:"The Revenue Act drops the rate from ~49% to 28%, sharply improving venture incentives.", ty:"Reg", mark:true},
+   {y:"1979", t:"ERISA \u201cprudent man\u201d rule", d:"Labor Department guidance lets pension funds invest in venture \u2014 unleashing a flood of institutional LP capital that built the modern industry.", ty:"Reg", mark:true}
+ ]},
+ {era:"The PC & Biotech Boom", yrs:"1980s", desc:"Landmark IPOs validate the model for public markets and a record wave of new funds floods in.", items:[
+   {y:"1980", t:"Apple & Genentech IPOs", d:"Two blockbuster public offerings prove venture-backed tech and biotech can mint enormous public-market value.", ty:"Exit", mark:true},
+   {y:"1981", t:"IBM PC launches", d:"The PC standard expands the hardware and software startup ecosystem.", ty:"Co"},
+   {y:"1982", t:"Compaq funded", d:"Sevin Rosen makes a then-record venture investment in Compaq.", ty:"Deal"},
+   {y:"1982", t:"Sun Microsystems", d:"Founded and funded (Kleiner Perkins among backers), becoming a workstation leader.", ty:"Co"},
+   {y:"1987", t:"Sequoia backs Cisco", d:"Don Valentine invests in the newly founded Cisco Systems.", ty:"Deal", mark:true},
+   {y:"1987", t:"Crash and shakeout", d:"The October crash and overcapacity cull weaker funds.", ty:"Milestone"}
+ ]},
+ {era:"The Internet Goldrush", yrs:"1990s", desc:"The browser opens the commercial web, and a euphoric run of foundings and IPOs detaches valuations from fundamentals.", items:[
+   {y:"1993", t:"Mosaic browser", d:"The graphical browser sparks the commercial internet.", ty:"Milestone"},
+   {y:"1994", t:"Netscape & Amazon founded", id:"netscape", d:"Kleiner Perkins and John Doerr back Netscape; Jeff Bezos starts Amazon.", ty:"Co", mark:true},
+   {y:"1995", t:"Netscape IPO lights the fuse", id:"netscape-ipo", d:"A spectacular debut ignites the dot-com boom; Yahoo (Sequoia) and eBay are founded.", ty:"Exit", mark:true},
+   {y:"1996", t:"Benchmark founded", d:"The firm soon makes a ~$6.7M bet on eBay that returns a legendary multiple.", ty:"Firm"},
+   {y:"1997\u201398", t:"Amazon & eBay IPOs", d:"Two defining internet exits validate aggressive early bets.", ty:"Exit"},
+   {y:"1998\u201399", t:"Google founded and funded", id:"google", d:"Sequoia and Kleiner Perkins co-invest ~$25M in 1999.", ty:"Deal", mark:true},
+   {y:"1999", t:"Peak euphoria", d:"Venture investment spikes as valuations detach from fundamentals.", ty:"Milestone"}
+ ]},
+ {era:"Bubble, Bust & Rebuild", yrs:"2000\u20132009", desc:"The crash resets the industry; a new generation of accelerators, firms, and mobile-era companies rebuilds it.", items:[
+   {y:"2000", t:"NASDAQ peaks, then crashes", d:"The March peak gives way to a collapse that erases paper fortunes.", ty:"Milestone", mark:true},
+   {y:"2001\u201302", t:"Contraction", d:"Funding and fundraising fall sharply; many firms wind down.", ty:"Milestone"},
+   {y:"2004", t:"Google IPO; Facebook & Thiel", id:"facebook", d:"Google's debut restores confidence; Peter Thiel makes a ~$500K first investment in Facebook.", ty:"Exit", mark:true},
+   {y:"2005", t:"Y Combinator; Accel backs FB", id:"yc", d:"Paul Graham and Jessica Livingston launch the accelerator model; Accel leads Facebook's ~$12.7M Series A.", ty:"Firm", mark:true},
+   {y:"2006", t:"YouTube acquired", d:"Sequoia's YouTube bet exits to Google for ~$1.65B.", ty:"Exit"},
+   {y:"2008", t:"Financial crisis", d:"Exits freeze and fundraising chills industry-wide.", ty:"Milestone"},
+   {y:"2009", t:"a16z launches; Uber & Airbnb", id:"a16z", d:"Andreessen Horowitz debuts as the mobile-era giants are founded.", ty:"Firm", mark:true}
+ ]},
+ {era:"Mobile, Megafunds & Mania", yrs:"2010\u20132019", desc:"Smartphones and cloud reshape startup formation, companies stay private longer, and fund sizes balloon.", items:[
+   {y:"2010", t:"Seed explosion", d:"Mobile and cloud slash startup costs; seed-stage investing proliferates.", ty:"Milestone"},
+   {y:"2012", t:"Facebook IPO", d:"The era's defining venture-backed public offering.", ty:"Exit", mark:true},
+   {y:"2013", t:"\u201cUnicorn\u201d coined", id:"unicorn", d:"Aileen Lee names the $1B private company \u2014 soon a flood, not a rarity.", ty:"Milestone", mark:true},
+   {y:"2014", t:"Mega late-stage rounds", d:"Companies raise enormous private rounds and delay going public.", ty:"Milestone"},
+   {y:"2017", t:"SoftBank Vision Fund", id:"vision-fund", d:"A ~$100B vehicle launches the megafund era and inflates late-stage valuations.", ty:"Fund", mark:true},
+   {y:"2019", t:"WeWork implosion", d:"A failed IPO punctures growth-at-all-costs; Uber and Lyft go public to mixed receptions.", ty:"Exit", mark:true}
+ ]},
+ {era:"ZIRP, Reckoning & the AI Era", yrs:"2020\u20132025", desc:"Cheap money drives a historic surge and bust, followed by capital concentrating in a handful of AI labs and infrastructure plays.", items:[
+   {y:"2020", t:"COVID + ZIRP surge", d:"Zero rates and pandemic shifts trigger a venture boom; SPACs offer an alternative exit.", ty:"Milestone", mark:true},
+   {y:"2021", t:"Record deployment", d:"U.S. venture tops ~$300B; Tiger Global and crossover funds blitz the market; crypto peaks.", ty:"Milestone", mark:true},
+   {y:"2022", t:"Rate hikes & FTX", d:"The cheap-money era ends, valuations compress, and FTX's November collapse hits blue-chip backers.", ty:"Milestone", mark:true},
+   {y:"2023", t:"SVB fails; AI surges", d:"Silicon Valley Bank collapses in March; generative-AI funding accelerates, led by OpenAI and Microsoft's ~$10B+ deal.", ty:"Milestone", mark:true},
+   {y:"2024", t:"AI megarounds vs. DPI drought", d:"OpenAI, Anthropic, and xAI raise at vast scale even as markdowns and a distributions shortfall pressure LPs.", ty:"Milestone", mark:true},
+   {y:"2025", t:"Capital concentration debate", d:"Funding concentrates in a few AI labs and infrastructure plays; the industry debates whether returns can justify the deployment.", ty:"Milestone", mark:true}
+ ]}
+];
+</script>
+<script>
+DATA.people = [
+ {nm:"Georges Doriot", tl:"ardc", role:"Investor", era:"1946\u201372", firm:"ARDC", wh:"The \u201cfather of venture capital.\u201d Built the first institutional VC firm and the DEC investment that proved the model."},
+ {nm:"Arthur Rock", tl:"davis-rock", role:"Investor", era:"1960s\u201380s", firm:"Davis & Rock", wh:"Backed Fairchild, Intel, and Apple; pioneered the West Coast VC limited partnership."},
+ {nm:"Tom Perkins", tl:"kp-sequoia", role:"Investor", era:"1972\u2013", firm:"Kleiner Perkins", wh:"Co-founder of KP; championed active, hands-on board involvement in portfolio companies."},
+ {nm:"Eugene Kleiner", tl:"kp-sequoia", role:"Both", era:"1972\u2013", firm:"Kleiner Perkins", wh:"One of Fairchild's \u201cTraitorous Eight\u201d turned VC; co-founded the archetypal Sand Hill firm."},
+ {nm:"Don Valentine", tl:"kp-sequoia", role:"Investor", era:"1972\u2013", firm:"Sequoia Capital", wh:"Founded Sequoia; obsessed with market size; early backer of Apple, Cisco, Oracle, and Google."},
+ {nm:"Tommy Davis", role:"Investor", era:"1960s", firm:"Davis & Rock", wh:"Rock's partner in the early limited-partnership fund that helped template the industry."},
+ {nm:"Laurance Rockefeller", role:"Investor", era:"1940s\u201360s", firm:"Rockefeller / Venrock", wh:"Family-office pioneer whose venture activity evolved into Venrock."},
+ {nm:"John Doerr", tl:"netscape", role:"Investor", era:"1980s\u2013", firm:"Kleiner Perkins", wh:"Backed Netscape, Amazon, and Google; a defining force of the internet-era boom."},
+ {nm:"Michael Moritz", tl:"google", role:"Investor", era:"1986\u2013", firm:"Sequoia Capital", wh:"Led Sequoia's bets on Yahoo, Google, and PayPal; among the most successful VCs ever."},
+ {nm:"Doug Leone", role:"Investor", era:"1988\u2013", firm:"Sequoia Capital", wh:"Built Sequoia into a global franchise alongside Moritz."},
+ {nm:"Bill Gurley", role:"Investor", era:"1999\u2013", firm:"Benchmark", wh:"Backed Uber; influential public writer on valuation discipline and market structure."},
+ {nm:"Fred Wilson", role:"Investor", era:"1996\u2013", firm:"Union Square Ventures", wh:"Backed Twitter, Etsy, and Coinbase; pioneered the VC-as-public-writer model via AVC."},
+ {nm:"Marc Andreessen", tl:"netscape", role:"Both", era:"1994\u2013", firm:"a16z / Netscape", wh:"Co-created the Netscape browser, then co-founded a16z and the modern platform-VC model."},
+ {nm:"Ben Horowitz", tl:"a16z", role:"Both", era:"1999\u2013", firm:"a16z / Opsware", wh:"Operator-turned-investor; co-founded a16z and shaped its founder-friendly thesis."},
+ {nm:"Peter Thiel", tl:"facebook", role:"Both", era:"1998\u2013", firm:"Founders Fund / PayPal", wh:"Co-founded PayPal and Palantir; first outside Facebook investor; contrarian thesis investor."},
+ {nm:"Vinod Khosla", role:"Both", era:"1982\u2013", firm:"Khosla Ventures / Sun", wh:"Co-founded Sun Microsystems, then became a leading deeptech and climate investor."},
+ {nm:"Mary Meeker", role:"Investor", era:"1990s\u2013", firm:"Bond / Kleiner Perkins", wh:"\u201cQueen of the Internet\u201d analyst-turned-investor; her trends reports shaped the field."},
+ {nm:"Mike Maples Jr.", role:"Investor", era:"2005\u2013", firm:"Floodgate", wh:"Seed-stage pioneer; popularized the \u201cthunder lizard\u201d and prime-mover thesis frameworks."},
+ {nm:"Josh Kopelman", role:"Both", era:"2004\u2013", firm:"First Round Capital", wh:"Built a leading seed firm and platform model for early-stage support."},
+ {nm:"Aileen Lee", tl:"unicorn", role:"Investor", era:"2012\u2013", firm:"Cowboy Ventures", wh:"Coined \u201cunicorn\u201d; advocate for early-stage and founder diversity."},
+ {nm:"Reid Hoffman", role:"Both", era:"2003\u2013", firm:"Greylock / LinkedIn", wh:"Founded LinkedIn, prolific angel (Facebook, Airbnb), then Greylock partner and theorist of blitzscaling."},
+ {nm:"Ron Conway", role:"Investor", era:"1990s\u2013", firm:"SV Angel", wh:"The original super-angel; seeded Google, PayPal, and hundreds of startups."},
+ {nm:"Naval Ravikant", role:"Both", era:"2010\u2013", firm:"AngelList", wh:"Built AngelList, democratizing angel investing and the rolling-fund/syndicate model."},
+ {nm:"Masayoshi Son", tl:"vision-fund", role:"Investor", era:"1981\u2013", firm:"SoftBank", wh:"Launched the ~$100B Vision Fund, defining \u2014 and distorting \u2014 the late-stage megafund era."},
+ {nm:"Yuri Milner", role:"Investor", era:"2009\u2013", firm:"DST Global", wh:"Pioneered large, founder-friendly late-stage rounds (Facebook, Twitter) with no board demands."},
+ {nm:"Paul Graham", tl:"yc", role:"Both", era:"2005\u2013", firm:"Y Combinator", wh:"Co-founded YC, inventing the modern accelerator and shaping startup culture through his essays."},
+ {nm:"Jessica Livingston", tl:"yc", role:"Investor", era:"2005\u2013", firm:"Y Combinator", wh:"YC co-founder; author of Founders at Work and a key architect of its community."},
+ {nm:"Brad Feld", book:"venture-deals", role:"Author", era:"1990s\u2013", firm:"Foundry Group", wh:"Co-author of Venture Deals; longtime VC and prolific demystifier of deal mechanics."},
+ {nm:"Jason Mendelson", book:"venture-deals", role:"Author", era:"1990s\u2013", firm:"Foundry Group", wh:"Co-author of Venture Deals; lawyer-turned-VC focused on term-sheet education."},
+ {nm:"Scott Kupor", book:"sand-hill", role:"Author", era:"2009\u2013", firm:"a16z", wh:"a16z managing partner; author of Secrets of Sand Hill Road, explaining VC to founders."},
+ {nm:"Mahendra Ramsinghani", book:"business-of-vc", role:"Author", era:"2000s\u2013", firm:"Secure Octane", wh:"Author of The Business of Venture Capital, the field's most thorough text on fund formation."},
+ {nm:"Allison Baum Gates", book:"breaking-in", role:"Author", era:"2010s\u2013", firm:"SemperVirens", wh:"Author of Breaking into Venture; frames entering the industry as a positioning problem."},
+ {nm:"Tom Nicholas", book:"american-history", role:"Author", era:"Present", firm:"Harvard Business School", wh:"Historian; author of VC: An American History, tracing the industry's structural origins."},
+ {nm:"Steve Jobs", tl:"apple", role:"Founder", era:"1976\u20132011", firm:"Apple", wh:"Co-founded Apple, the archetypal venture-backed outcome and product-vision founder."},
+ {nm:"Steve Wozniak", tl:"apple", role:"Founder", era:"1976\u2013", firm:"Apple", wh:"Apple's technical co-founder, who built the early machines that launched the PC era."},
+ {nm:"Robert Noyce", tl:"fairchild", role:"Founder", era:"1957\u201390", firm:"Fairchild / Intel", wh:"Co-invented the integrated circuit; co-founded Fairchild and Intel \u2014 Silicon Valley's patriarch."},
+ {nm:"Gordon Moore", tl:"fairchild", role:"Founder", era:"1957\u2013", firm:"Fairchild / Intel", wh:"Intel co-founder; \u201cMoore's Law\u201d framed the economics of the entire semiconductor era."},
+ {nm:"Bill Gates", role:"Founder", era:"1975\u2013", firm:"Microsoft", wh:"Co-founded Microsoft; defined the software-platform business model."},
+ {nm:"Larry Page", tl:"google", role:"Founder", era:"1998\u2013", firm:"Google", wh:"Co-founded Google, the defining venture return of the internet era."},
+ {nm:"Sergey Brin", tl:"google", role:"Founder", era:"1998\u2013", firm:"Google", wh:"Google co-founder; co-architect of the search and ads model."},
+ {nm:"Jeff Bezos", tl:"netscape", role:"Both", era:"1994\u2013", firm:"Amazon", wh:"Founded Amazon; also an active angel (Google, Uber) and long-horizon operator-investor."},
+ {nm:"Mark Zuckerberg", tl:"facebook", role:"Founder", era:"2004\u2013", firm:"Meta", wh:"Founded Facebook/Meta, the canonical social-platform venture outcome."},
+ {nm:"Elon Musk", role:"Both", era:"1999\u2013", firm:"Tesla / SpaceX / xAI", wh:"Serial founder (PayPal, Tesla, SpaceX, xAI); reshaped deeptech venture ambition."},
+ {nm:"Larry Ellison", role:"Founder", era:"1977\u2013", firm:"Oracle", wh:"Founded Oracle; built the enterprise-software giant on early venture backing."},
+ {nm:"Marc Benioff", role:"Founder", era:"1999\u2013", firm:"Salesforce", wh:"Founded Salesforce; pioneered the SaaS/cloud business model."},
+ {nm:"Reed Hastings", role:"Founder", era:"1997\u2013", firm:"Netflix", wh:"Founded Netflix; case study in repeated business-model reinvention."},
+ {nm:"Brian Chesky", tl:"a16z", role:"Founder", era:"2008\u2013", firm:"Airbnb", wh:"Co-founded Airbnb; emblem of the YC-and-marketplace generation."},
+ {nm:"Patrick & John Collison", role:"Founder", era:"2010\u2013", firm:"Stripe", wh:"Co-founded Stripe, the defining developer-infrastructure and fintech outcome of the 2010s."},
+ {nm:"Jensen Huang", role:"Founder", era:"1993\u2013", firm:"Nvidia", wh:"Co-founded Nvidia; its GPUs became the core infrastructure of the AI era."},
+ {nm:"Sam Altman", role:"Both", era:"2005\u2013", firm:"OpenAI / YC", wh:"Former YC president; co-founded and leads OpenAI, anchoring the generative-AI funding wave."},
+ {nm:"Pierre Omidyar", tl:"netscape-ipo", role:"Founder", era:"1995\u2013", firm:"eBay", wh:"Founded eBay, the marketplace exit that minted Benchmark's legendary early return."}
+];
+</script>
+<script>
+DATA.chapters["sand-hill"] = [
+ {n:"1", title:"VC behavior is downstream of LP incentives", body:"GPs are not investing their own money; they raise it from limited partners and are obligated to return it. The pressure a VC puts on a founder usually reflects obligations flowing upward to LPs, not personal caprice \u2014 which is why understanding that chain explains most VC behavior."},
+ {n:"2", title:"The power law dictates the whole model", body:"Returns are so skewed that one or two investments must return an entire fund. That forces a VC to back only companies with a credible path to an enormous outcome, and explains the relentless focus on market size, ownership, and growth that can feel at odds with a founder's own risk appetite."},
+ {n:"3", title:"Forget the batting average", body:"Success in venture is measured by the magnitude of the winners, not the share of investments that work. A VC who is frequently right but never backs a giant will underperform one who is often wrong but catches a few outsized hits."},
+ {n:"4", title:"A mediocre asset class with extreme dispersion", body:"In aggregate, venture returns are unremarkable; almost all the gains accrue to a small set of top-quartile firms. This dispersion is why access to the best firms matters far more than mere exposure to the category."},
+ {n:"5", title:"Positive signaling cuts both ways", body:"The market reads who invests and whether they re-invest. A strong lead helps a startup raise the next round; conversely, a prominent existing investor declining to follow on can quietly poison a company's prospects."},
+ {n:"6", title:"The LPA is the rulebook", body:"The limited partnership agreement governs a fund's life, fees, carry, and how money flows back to LPs. Its terms shape how a GP behaves toward portfolio companies, including appetite for follow-ons and time horizon."},
+ {n:"7", title:"Early-stage decisions reduce to people, product, market", body:"With almost no operating data, early-stage investors weight the team and the size of the market most heavily, treating the product as evidence of the team's insight. The relative emphasis shifts toward metrics as a company matures."},
+ {n:"8", title:"A term sheet has two halves: economics and governance", body:"Kupor splits the term sheet into economics (preference, price, conversion, antidilution) and governance (board, protective provisions, drag-along). Founders routinely over-index on valuation while underweighting the control terms that determine who actually decides."},
+ {n:"9", title:"Boards owe fiduciary duties, and share classes can conflict", body:"Directors owe duties of care and loyalty to the corporation, not to a single share class. The In re Trados case shows how a board can satisfy preferred holders' liquidation preference while leaving common shareholders with nothing \u2014 a warning to understand whose interests a decision really serves."},
+ {n:"10", title:"Down rounds and exits are survivable", body:"A hard financing is not automatically fatal. Reducing or restructuring liquidation preferences, recapitalizing, and understanding the mechanics of acquisitions and IPOs can turn a painful moment into a reset rather than an ending."}
+];
+DATA.chapters["business-of-vc"] = [
+ {n:"1", title:"A small, non-scalable, home-run business", body:"Ramsinghani opens by insisting on realism: capital is abundant relative to genuine investing talent, performance is wildly dispersed, and the model does not scale like software. Returns come from a few home runs and from scarce judgment and access."},
+ {n:"2", title:"The universe of limited partners", body:"Fund capital comes from pensions, endowments, foundations, family offices, funds-of-funds, and sovereign wealth, each with different goals, horizons, and constraints. Knowing what each type of LP actually wants is the starting point for raising a fund."},
+ {n:"3", title:"How LPs diligence and select GPs", body:"Limited partners hunt for the elusive top-quartile manager, scrutinizing track record by attribution rather than by logos, the team's cohesion, the strategy, and portfolio-construction discipline. Emerging managers represent a higher-risk bet on future access and returns."},
+ {n:"4", title:"The LPA and PPM define the deal with LPs", body:"The limited partnership agreement and private placement memorandum set fund life, management fee, carried interest, the GP commitment, key-person provisions, and the distribution waterfall \u2014 the terms that govern the entire GP\u2013LP relationship."},
+ {n:"5", title:"Getting to a first close", body:"Raising a fund means building a target LP list, crafting credible marketing materials, and attracting an anchor lead LP \u2014 the \u2018nut\u2019 \u2014 whose commitment creates momentum. Placement agents and offering sweeteners can help but carry real trade-offs."},
+ {n:"6", title:"Sourcing is a networked craft", body:"The best deal flow comes through relationships and proprietary channels \u2014 academia and corporate research, venture events, \u2018venture farming,\u2019 and trusted angels \u2014 far more than cold inbound. Sourcing is the top of the funnel everything else depends on."},
+ {n:"7", title:"Diligence on jockey, horse, and market", body:"Ramsinghani frames diligence around the founder and team (the jockey), the product (the horse), and the market. He weighs serial against first-time founders, insists on real background investigation, and treats polished business plans with healthy skepticism."},
+ {n:"8", title:"Structuring and boards create or destroy value", body:"Term structuring to reach target returns, governance terms to protect the investment, and disciplined, well-cultured board service are where a GP adds value after the check clears \u2014 or quietly subtracts it through neglect or bad behavior."},
+ {n:"9", title:"Exits are engineered, not awaited", body:"Liquidity is the point of the whole exercise. Acquisitions are the primary path, run through a deliberate sell process with deal-killers to be managed; IPOs are the rarer and more demanding route."}
+];
+DATA.chapters["breaking-in"] = [
+ {n:"1", title:"How you invest your time is as important as how you invest your money", body:"Your calendar is a portfolio. Where you spend attention compounds like invested capital, so allocate your time with the same rigor you would apply to money \u2014 toward the relationships and learning that build a durable edge."},
+ {n:"2", title:"Networks trump knowledge", body:"In a relationship-driven business defined by information asymmetry, access to people and deal flow beats accumulated theory. Who you know, and who trusts you, is the real moat \u2014 not how much you have read."},
+ {n:"3", title:"Your investment thesis is your foundation for success", body:"A clear, differentiated thesis is what everything else rests on. It organizes your sourcing, sharpens your filtering, and gives you credibility; without one you are a generalist competing on access you do not have."},
+ {n:"4", title:"Timing is (almost) everything", body:"Most venture failures are mistimed rather than simply wrong. Reading where a market sits on its adoption curve \u2014 too early, too late, or just right \u2014 matters more than being directionally correct about the destination."},
+ {n:"5", title:"Money matters", body:"Good judgment about companies is worthless if you do not understand how the money works. Fund math, ownership, dilution, and the mechanics of returns determine whether a good company is also a good investment."},
+ {n:"6", title:"Actively manage your blind spots", body:"Experience builds pattern recognition, but that same pattern recognition is a source of bias. Build deliberate process and seek diverse inputs to counter the cognitive traps that grow with seniority."},
+ {n:"7", title:"Double down on what makes you different", body:"Differentiation beats imitation. Rather than copying established investors, lean into the distinct background, network, and perspective that let you see and win deals others cannot."},
+ {n:"8", title:"Prioritize your winners", body:"In a power-law portfolio, attention and follow-on capital should concentrate on the breakouts. Spreading effort evenly, or propping up the strugglers, wastes the scarce resource the winners actually need."},
+ {n:"9", title:"Stay the course", body:"Venture is a long game measured in fund cycles. Consistency, reputation, and simply surviving across cycles are what put you in position when the rare, enormous winner finally appears."}
+];
+DATA.chapters["american-history"] = [
+ {n:"1", title:"Whaling was the structural ancestor of VC", body:"Agents pooled capital from many investors to fund long, dangerous voyages with extreme, skewed payoffs, taking a share of the profits. This prefigures the modern fund, the GP role, and carried interest centuries before Silicon Valley."},
+ {n:"2", title:"The power law is the through-line of the whole history", body:"Across two centuries, returns to risk capital have been dominated by a tiny number of outsized successes. This skew is the model's defining and remarkably persistent feature, not a recent artifact of tech."},
+ {n:"3", title:"Scaling risk capital required new vehicles", body:"Moving from individual family fortunes to professional firms \u2014 ARDC under Georges Doriot \u2014 and then to repeatable fund structures was what turned occasional patronage into a genuine industry."},
+ {n:"4", title:"Market versus government provision of risk capital", body:"Public programs such as the SBIC era expanded the supply of risk capital, but Nicholas argues it was private, market-driven structures that ultimately dominated and proved most durable."},
+ {n:"5", title:"The limited partnership was the pivotal innovation", body:"Aligning GPs and LPs through fee-and-carry economics and finite fund lives created the organizational template that still governs the industry today \u2014 arguably its single most important structural breakthrough."},
+ {n:"6", title:"Agglomeration matters", body:"The concentration of talent, capital, and tacit knowledge in Silicon Valley produced self-reinforcing advantages that history suggests are extremely hard to replicate elsewhere, despite many attempts."},
+ {n:"7", title:"Whether VC's returns justify its risk is genuinely contested", body:"Nicholas offers a sober counterweight to industry mythology: much of the measured outperformance is concentrated in a few funds, dependent on timing, and difficult to disentangle from luck."}
+];
+
+DATA.flashcards = DATA.flashcards.concat([
+ {deck:"sand-hill", front:"Kupor: why do VCs push so hard for huge markets?", back:"Because the power law means one or two investments must return the entire fund, so every bet needs a credible path to an enormous outcome.", rev:false},
+ {deck:"sand-hill", front:"Why does Kupor say to \u2018forget the batting average\u2019?", back:"Venture success is measured by the magnitude of the winners, not the percentage that work; a few giant hits beat many modest ones.", rev:false},
+ {deck:"sand-hill", front:"Whose incentives ultimately drive how a VC treats a founder?", back:"The LPs\u2019. GPs manage other people\u2019s money and must return it, so their pressure reflects obligations flowing upward, not caprice.", rev:false},
+ {deck:"sand-hill", front:"Positive signaling", back:"The market\u2019s inference from who invests and whether existing investors follow on \u2014 a powerful, double-edged influence on a startup\u2019s ability to raise.", rev:true},
+ {deck:"sand-hill", front:"VC as an asset class, per Kupor", back:"Historically mediocre in aggregate with extreme dispersion \u2014 nearly all returns accrue to a small set of top-quartile firms, which is why access matters.", rev:false},
+ {deck:"sand-hill", front:"The two halves of a term sheet (Kupor)", back:"Economics and governance \u2014 and founders tend to fixate on valuation while underweighting control.", rev:false},
+ {deck:"sand-hill", front:"What does the In re Trados case warn founders about?", back:"A board can satisfy preferred holders\u2019 liquidation preference while leaving common with nothing; understand fiduciary duties and whose interests are served.", rev:false},
+ {deck:"sand-hill", front:"Early-stage investment decision factors", back:"People/team, product, and market size \u2014 weighted heavily because there is little operating data yet.", rev:false},
+ {deck:"sand-hill", front:"Fiduciary duties a board owes", back:"Duties of care and loyalty (plus candor and confidentiality) \u2014 to act informed and in the corporation\u2019s interest, not one share class\u2019s.", rev:false},
+ {deck:"sand-hill", front:"Top-quartile firm", back:"A fund in the top 25% of its vintage by performance; in VC\u2019s skewed returns these capture a hugely disproportionate share of the gains.", rev:true},
+
+ {deck:"business-of-vc", front:"Placement agent", back:"An intermediary hired to help a GP raise a fund by introducing and marketing to LPs, typically for a fee on committed capital.", rev:true},
+ {deck:"business-of-vc", front:"Private Placement Memorandum (PPM)", back:"The legal offering document a fund gives prospective LPs, describing strategy, terms, risks, and team.", rev:true},
+ {deck:"business-of-vc", front:"First close", back:"The point at which a fund secures its initial committed capital and can begin investing, ahead of a final close.", rev:true},
+ {deck:"business-of-vc", front:"GP commitment", back:"The capital the general partners invest in their own fund \u2014 skin in the game LPs expect, historically around 1\u20132% or more.", rev:true},
+ {deck:"business-of-vc", front:"Key-person provision", back:"An LPA clause that pauses or restricts a fund if named critical partners leave or stop devoting time to it.", rev:true},
+ {deck:"business-of-vc", front:"Emerging manager", back:"A new or early-fund GP without a long track record; a higher-risk LP bet on future access and returns.", rev:true},
+ {deck:"business-of-vc", front:"The \u2018nut\u2019 (anchor lead LP)", back:"Ramsinghani\u2019s term for the anchor limited partner whose early commitment creates momentum for a fund\u2019s raise.", rev:true},
+ {deck:"business-of-vc", front:"Ramsinghani\u2019s \u2018jockey, horse, and market\u2019", back:"The three diligence focuses: the founder/team (jockey), the product (horse), and the market.", rev:false},
+ {deck:"business-of-vc", front:"Why not pretend VC is scalable?", back:"Returns come from a few home runs and depend on scarce judgment and access; the model cannot scale like a software business.", rev:false},
+ {deck:"business-of-vc", front:"What do LPs hunt for when selecting GPs?", back:"The elusive top-quartile manager \u2014 scrutinizing attributable track record, team, strategy, and portfolio-construction discipline.", rev:false},
+ {deck:"business-of-vc", front:"Primary path to a venture exit", back:"Acquisition, run through a deliberate sell process; IPOs are the rarer and more demanding route.", rev:false},
+ {deck:"business-of-vc", front:"Where does the best deal flow come from?", back:"Networks and proprietary channels \u2014 relationships, academia, corporate research, events \u2014 far more than cold inbound.", rev:false},
+ {deck:"business-of-vc", front:"Track record attribution", back:"Crediting specific returns to the partner actually responsible rather than the firm\u2019s logos \u2014 central to LP diligence on a GP.", rev:true},
+
+ {deck:"breaking-in", front:"Baum Gates: what is more valuable than knowledge in VC?", back:"Your network. Access to people and deal flow beats accumulated theory in a relationship-driven, information-asymmetric business.", rev:false},
+ {deck:"breaking-in", front:"What does Baum Gates call the foundation of investing success?", back:"A clear, differentiated investment thesis \u2014 it organizes sourcing, sharpens filtering, and creates credibility.", rev:false},
+ {deck:"breaking-in", front:"Why is timing \u2018almost everything\u2019?", back:"Most venture failures are mistimed rather than wrong; reading the adoption curve matters more than being directionally correct.", rev:false},
+ {deck:"breaking-in", front:"How should you treat your time in VC (Principle 1)?", back:"As a portfolio \u2014 attention compounds like capital, so allocate it with the same rigor you apply to money.", rev:false},
+ {deck:"breaking-in", front:"What does \u2018actively manage your blind spots\u2019 mean?", back:"Your pattern recognition is also your bias; build deliberate process and diverse inputs to counter cognitive traps.", rev:false},
+ {deck:"breaking-in", front:"Principle 7: how does a newer investor win?", back:"Double down on what makes you different \u2014 differentiation over imitation; lean into your distinct edge.", rev:false},
+ {deck:"breaking-in", front:"Principle 8 in a power-law portfolio?", back:"Prioritize your winners \u2014 concentrate follow-on capital and attention on the breakouts, not the strugglers.", rev:false},
+ {deck:"breaking-in", front:"What does \u2018stay the course\u2019 reflect about VC?", back:"It is a long game measured in fund cycles; survival, consistency, and reputation let the rare winners pay off.", rev:false},
+ {deck:"breaking-in", front:"Baum Gates\u2019 three movements of the VC job", back:"Access, Analyze, and Add Value.", rev:false},
+ {deck:"breaking-in", front:"Is breaking into VC a credentials problem?", back:"No \u2014 Baum Gates frames it as a positioning and judgment problem; differentiation and network matter more than pedigree.", rev:false},
+
+ {deck:"american-history", front:"Nicholas: the structural ancestor of modern VC?", back:"19th-century New England whaling \u2014 pooled investor capital, long risky voyages, extreme skew, and agents earning a profit share.", rev:false},
+ {deck:"american-history", front:"The persistent through-line of VC history?", back:"The power law \u2014 returns dominated by a tiny number of outsized successes across two centuries.", rev:false},
+ {deck:"american-history", front:"What organizational innovation made scalable risk capital possible?", back:"The limited partnership structure, aligning GPs and LPs via fee-and-carry economics and finite fund lives.", rev:false},
+ {deck:"american-history", front:"Who was Georges Doriot, historically?", back:"Founder of ARDC, the first institutional VC firm, and a formative figure in professionalizing risk capital.", rev:false},
+ {deck:"american-history", front:"\u2018Market versus government\u2019 in Nicholas?", back:"The contest between private markets and public programs (e.g., SBICs) in supplying risk capital \u2014 private structures ultimately dominated.", rev:false},
+ {deck:"american-history", front:"Why does agglomeration matter in VC history?", back:"Concentrated talent, capital, and tacit knowledge create self-reinforcing advantages that are very hard to replicate elsewhere.", rev:false},
+ {deck:"american-history", front:"What sober question does Nicholas keep returning to?", back:"Whether VC\u2019s aggregate returns actually justify its risk, given how concentrated, timing-dependent, and luck-entangled they are.", rev:false}
+]);
+
+DATA.glossary = DATA.glossary.concat([
+ {t:"GP commitment", c:"Fund Economics", d:"The capital general partners invest in their own fund \u2014 the skin in the game LPs expect, historically around 1\u20132% or more of fund size."},
+ {t:"Placement agent", c:"Fund Economics", d:"An intermediary hired to help a GP raise a fund by introducing and marketing to LPs, typically for a fee on committed capital."},
+ {t:"Private Placement Memorandum (PPM)", c:"Fund Economics", d:"The legal offering document a fund provides to prospective LPs, setting out strategy, terms, risks, and team."},
+ {t:"First / final close", c:"Fund Economics", d:"The first close is when a fund secures enough commitments to begin investing; the final close ends fundraising at the fund\u2019s total committed size."},
+ {t:"Preferred return (hurdle rate)", c:"Fund Economics", d:"The minimum return LPs must receive before the GP earns carried interest \u2014 less common in VC than in private equity, but increasingly negotiated."},
+ {t:"GP catch-up", c:"Fund Economics", d:"A waterfall step after the preferred return in which the GP takes a larger share until its overall carry reaches the agreed percentage."},
+ {t:"Distribution waterfall", c:"Fund Economics", d:"The contractual order in which fund proceeds flow: return of capital and any preferred return to LPs, then GP catch-up and the carry split."},
+ {t:"Key-person provision", c:"Fund Economics", d:"An LPA clause that pauses or restricts a fund if named critical partners depart or stop devoting time to it."},
+ {t:"Side letter", c:"Fund Economics", d:"A separate agreement granting a specific LP terms beyond the main fund documents, such as fee breaks or reporting rights."},
+ {t:"Most-favored-nation (MFN) clause", c:"Fund Economics", d:"A provision letting certain LPs claim the most favorable terms granted to any other LP via side letters."},
+ {t:"Fund-of-funds", c:"Fund Economics", d:"An LP vehicle that invests across multiple venture funds rather than directly in companies, offering diversification and access."},
+ {t:"Emerging manager", c:"Fund Economics", d:"A new or early-fund GP without an established track record; a higher-risk LP bet on future access and returns."},
+ {t:"Portfolio construction", c:"Fund Economics", d:"The deliberate design of a fund\u2019s investments \u2014 number of bets, check sizes, ownership targets, and reserves \u2014 to fit its return strategy."},
+ {t:"Cross-fund investing", c:"Fund Economics", d:"When a GP invests in the same company from more than one of its funds, creating potential conflicts that LPAs constrain."},
+ {t:"Top-quartile", c:"Performance Metrics", d:"A fund ranking in the top 25% of its vintage; in VC\u2019s skewed returns, these funds capture a hugely disproportionate share of the gains."},
+ {t:"Deal flow", c:"Process", d:"The stream of investment opportunities an investor sees; proprietary, high-quality deal flow is a core competitive advantage."},
+ {t:"Investment thesis", c:"Process", d:"An investor\u2019s articulated view of where value will be created and why they are positioned to capture it \u2014 the organizing basis for sourcing and decisions."}
+]);
+</script>
+<script>
+(function(){
+  "use strict";
+  var view = document.getElementById("view");
+  var tabsEl = document.getElementById("tabs");
+  var TABS = [
+    ["", "Home"], ["books","Books"], ["timeline","Timeline"],
+    ["flashcards","Flashcards"], ["glossary","Glossary"], ["rolodex","Rolodex"]
+  ];
+
+  /* ---------- storage (localStorage w/ in-memory fallback) ---------- */
+  var mem = {};
+  var canLS = (function(){ try{ var k="__tst"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
+  function getS(k){ try{ return canLS ? localStorage.getItem(k) : (mem[k]||null); }catch(e){ return mem[k]||null; } }
+  function setS(k,v){ try{ if(canLS) localStorage.setItem(k,v); else mem[k]=v; }catch(e){ mem[k]=v; } }
+  function delPrefix(p){ try{ if(canLS){ var rm=[]; for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i); if(key.indexOf(p)===0) rm.push(key);} rm.forEach(function(x){localStorage.removeItem(x);}); } else { Object.keys(mem).forEach(function(x){ if(x.indexOf(p)===0) delete mem[x]; }); } }catch(e){} }
+
+  /* ---------- build flashcard universe ---------- */
+  var DAY = 86400000;
+  var INTERVALS = {1:DAY,2:3*DAY,3:7*DAY,4:16*DAY,5:35*DAY};
+  var SRS_PREFIX = "tst_srs_";
+  var CARDS = [];
+  DATA.flashcards.forEach(function(c,i){
+    var base = c.deck+"-"+i;
+    if(c.rev){
+      CARDS.push({id:base+"-f", deck:c.deck, dir:"Term \u2192 Definition", prompt:c.front, answer:c.back});
+      CARDS.push({id:base+"-r", deck:c.deck, dir:"Definition \u2192 Term", prompt:c.back, answer:c.front});
+    } else {
+      CARDS.push({id:base+"-c", deck:c.deck, dir:"Concept", prompt:c.front, answer:c.back});
+    }
+  });
+  function cardState(id){ var raw=getS(SRS_PREFIX+id); if(!raw) return {box:1,due:0}; try{ return JSON.parse(raw); }catch(e){ return {box:1,due:0}; } }
+  function saveCard(id,st){ setS(SRS_PREFIX+id, JSON.stringify(st)); }
+  function deckLabel(slug){ var b=DATA.books.filter(function(x){return x.slug===slug;})[0]; return b?b.title:slug; }
+  function decksWithCards(){ var s={}; CARDS.forEach(function(c){s[c.deck]=1;}); return Object.keys(s); }
+
+  /* ---------- in-page scroll (era nav + cross-links) ---------- */
+  var pendingTLScroll=null;
+  function scrollToId(id){ var el=document.getElementById(id); if(el&&el.scrollIntoView){ el.scrollIntoView({behavior:"smooth",block:"center"}); if(el.classList){ el.classList.add("target"); setTimeout(function(){ try{el.classList.remove("target");}catch(e){} },2400); } } }
+
+  /* ---------- router ---------- */
+  function parse(){ var h=(location.hash||"#/").replace(/^#\/?/,""); return h.split("/"); }
+  function go(){ window.scrollTo(0,0); var p=parse(); var root=p[0]||"";
+    TABS.forEach(function(t){}); paintTabs(root);
+    if(root==="") return renderHome();
+    if(root==="books") return renderBooks();
+    if(root==="book") return renderBook(p[1]);
+    if(root==="timeline") return renderTimeline();
+    if(root==="flashcards") return renderFlashcards();
+    if(root==="glossary") return renderGlossary();
+    if(root==="rolodex") return renderRolodex();
+    renderHome();
+  }
+  function paintTabs(root){
+    tabsEl.innerHTML = TABS.map(function(t){
+      var active = (t[0]===root || (root==="book" && t[0]==="books")) ? " active":"";
+      return '<a class="'+active.trim()+'" href="#/'+t[0]+'">'+t[1]+'</a>';
+    }).join("");
+  }
+
+  /* ---------- HOME ---------- */
+  function renderHome(){
+    var total=CARDS.length, mastered=0;
+    CARDS.forEach(function(c){ if(cardState(c.id).box>=4) mastered++; });
+    var cards = [
+      ["books","01","Book Summaries","Five canonical texts \u2014 a one-page synthesis of each, plus chapter-by-chapter breakdowns."],
+      ["timeline","02","History Timeline","From 19th-century whaling syndicates to the 2025 AI-capital concentration, in nine eras."],
+      ["flashcards","03","Flashcards","Spaced-repetition study with bidirectional term/definition cards. Progress saved locally."],
+      ["glossary","04","Glossary","A searchable, categorized reference of the field's working vocabulary."],
+      ["rolodex","05","Rolodex","The ~50 founders and investors any serious VC should be able to place."]
+    ];
+    view.innerHTML =
+      '<span class="kicker">Start Here</span>'+
+      '<h1 class="page">A study desk for venture capital.</h1>'+
+      '<p class="lead">Venture capital runs on its own language, its own math, and a history most people never learn. This is a self-paced way to actually retain it: clear summaries to build the map, a timeline to hold the history, and spaced-repetition flashcards to lock in the vocabulary.</p>'+
+      '<div class="tsblock"><span class="label">Offering Terms</span>'+
+        '<div class="tsrow"><div class="k">What It Is</div><div class="v">A free, self-paced primer on how venture capital actually works — the deals, the economics, the people, and the history.</div></div>'+
+        '<div class="tsrow"><div class="k">How To Use It</div><div class="v">Read the summaries to build the map, drill the <span class="hl">flashcards</span> to make it stick, and keep the glossary and timeline open as reference.</div></div>'+
+        '<div class="tsrow"><div class="k">Who It’s For</div><div class="v">Founders raising a round, operators moving into investing, and anyone learning the mechanics of startup finance.</div></div>'+
+        '<div class="tsrow"><div class="k">Your Progress</div><div class="v">'+mastered+' of '+total+' flashcards reaching mastery.</div></div>'+
+        '<div class="tsrow"><div class="k">Where To Start</div><div class="v">New to the subject? Begin with the Venture Deals summary, then test yourself in Flashcards.</div></div>'+
+      '</div>'+
+      '<div class="grid two" style="margin-top:28px">'+
+        cards.map(function(c){ return '<a class="navcard" href="#/'+c[0]+'"><span class="n">'+c[1]+'</span><h3>'+c[2]+'</h3><p>'+c[3]+'</p></a>'; }).join("")+
+      '</div>'+
+      '<p class="note">Every summary here is written from the ground up for studying. You can find the books they draw on, and read each one in depth, in the Books section.</p>';
+  }
+
+  /* ---------- BOOKS ---------- */
+  function renderBooks(){
+    view.innerHTML =
+      '<span class="kicker">Section 01</span><h1 class="page">The Books</h1>'+
+      '<p class="lead">Five books form the backbone of this primer, each bringing a different lens: the deal mechanics, the founder’s playbook, the fund manager’s craft, the career path, and the long history.</p>'+
+      DATA.books.map(function(b){
+        var pill = b.status==="done" ? '<span class="pill done">Summary ready</span>' : '<span class="pill queue">Coming soon</span>';
+        var title = b.status==="done" ? '<a class="tt" href="#/book/'+b.slug+'">'+b.title+'</a>' : '<span class="tt">'+b.title+'</span>';
+        var foot = b.status==="done" ? '<div class="blurb"><a href="#/book/'+b.slug+'">Read the summary &amp; chapters \u2192</a></div>' : '<div class="blurb muted">'+(b.queuedNote||"")+'</div>';
+        return '<div class="bookrow"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">'+
+          '<div>'+title+'<div class="by">'+b.author+' \u00b7 '+b.year+'</div></div>'+pill+'</div>'+
+          '<div class="blurb">'+b.blurb+'</div>'+foot+'</div>';
+      }).join("");
+  }
+
+  function renderBook(slug){
+    var b = DATA.books.filter(function(x){return x.slug===slug;})[0];
+    if(!b){ view.innerHTML='<a class="backlink" href="#/books">\u2190 Books</a><p>Not found.</p>'; return; }
+    if(b.status!=="done"){
+      view.innerHTML='<a class="backlink" href="#/books">\u2190 All Books</a>'+
+        '<span class="kicker">'+b.role+'</span><h1 class="page">'+b.title+'</h1>'+
+        '<div class="by" style="font-style:italic;color:var(--muted);margin-bottom:18px">'+b.author+' \u00b7 '+b.year+'</div>'+
+        '<p class="lead">'+b.blurb+'</p>'+
+        '<div class="tsblock"><span class="label">Coming soon</span><p style="margin:0">'+(b.queuedNote||"An in-depth summary of this book is coming soon.")+'</p></div>';
+      return;
+    }
+    var chaps = DATA.chapters[slug]||[];
+    var deckN = DATA.flashcards.filter(function(c){return c.deck===slug;}).length;
+    var studyBtn = deckN ? '<div class="studydeck"><a class="btn" id="studydeckbtn" href="#/flashcards">Study the '+deckN+' flashcards from this book \u2192</a></div>' : '';
+    view.innerHTML='<a class="backlink" href="#/books">\u2190 All Books</a>'+
+      '<span class="kicker">'+b.role+'</span><h1 class="page">'+b.title+'</h1>'+
+      '<div class="by" style="font-style:italic;color:var(--muted);margin-bottom:18px">'+b.author+' \u00b7 '+b.year+'</div>'+
+      '<div class="tsblock"><span class="label">Book Summary</span><p style="margin:0">'+b.summary+'</p></div>'+
+      studyBtn+
+      '<h2 class="sec">'+(b.sectionTitle||"Chapter by Chapter")+'</h2>'+
+      '<div class="chapnav">'+chaps.map(function(c,i){return '<a href="#ch'+i+'">'+c.n+'</a>';}).join("")+'</div>'+
+      chaps.map(function(c,i){ return '<div class="chap" id="ch'+i+'"><span class="cn">'+(b.unitLabel||"Chapter")+' '+c.n+'</span><h3>'+c.title+'</h3><p>'+c.body+'</p></div>'; }).join("");
+    if(deckN){ var sb=document.getElementById("studydeckbtn"); if(sb) sb.addEventListener("click",function(){ fcDeck=slug; fcMode="study"; session=null; }); }
+  }
+
+  /* ---------- TIMELINE ---------- */
+  var tlActive = "ALL";
+  function eraId(i){ return "era-"+i; }
+  function renderTimeline(){
+    var types = ["ALL","Milestone","Firm","Fund","Deal","Exit","Co","Reg"];
+    var labelMap = {Co:"Company", Reg:"Regulation"};
+    view.innerHTML =
+      '<span class="kicker">Section 02</span><h1 class="page">A History of Venture Capital</h1>'+
+      '<p class="lead">The structural story \u2014 why a tiny asset class built on power-law outcomes came to look the way it does \u2014 told in nine eras.</p>'+
+      '<div class="eranav" id="enav">'+DATA.timeline.map(function(era,i){return '<button data-e="'+i+'" title="'+era.era+'">'+era.yrs+'</button>';}).join("")+'</div>'+
+      '<div class="tlfilter" id="tlf">'+types.map(function(t){return '<button data-t="'+t+'" class="'+(t===tlActive?"on":"")+'">'+(t==="ALL"?"All":(labelMap[t]||t))+'</button>';}).join("")+'</div>'+
+      '<div id="tlbody"></div>';
+    document.getElementById("tlf").addEventListener("click",function(e){ if(e.target.tagName==="BUTTON"){ tlActive=e.target.getAttribute("data-t"); renderTimeline(); }});
+    document.getElementById("enav").addEventListener("click",function(e){ if(e.target.tagName==="BUTTON"){ scrollToId(eraId(+e.target.getAttribute("data-e"))); }});
+    var body = DATA.timeline.map(function(era,ei){
+      var items = era.items.filter(function(it){ return tlActive==="ALL" || it.ty===tlActive; });
+      if(!items.length) return "";
+      return '<div class="era" id="'+eraId(ei)+'">'+era.era+'<span class="yrs">'+era.yrs+'</span></div>'+
+        '<div class="era-desc">'+era.desc+'</div>'+
+        '<div class="tl">'+items.map(function(it){
+          return '<div class="tlitem'+(it.mark?" mark":"")+'"'+(it.id?' id="tl-'+it.id+'"':'')+'><span class="yr">'+it.y+'</span> \u2014 <span class="tt">'+it.t+'</span><span class="ty">'+(labelMap[it.ty]||it.ty)+'</span><div class="ds">'+it.d+'</div></div>';
+        }).join("")+'</div>';
+    }).join("");
+    document.getElementById("tlbody").innerHTML = body || '<p class="muted">No events of this type.</p>';
+    if(pendingTLScroll){ var pid="tl-"+pendingTLScroll; pendingTLScroll=null; setTimeout(function(){ scrollToId(pid); },60); }
+  }
+
+  /* ---------- GLOSSARY ---------- */
+  var gQuery="", gCat="All";
+  function renderGlossary(){
+    var cats = ["All"].concat(Object.keys(DATA.glossary.reduce(function(a,t){a[t.c]=1;return a;},{})));
+    view.innerHTML =
+      '<span class="kicker">Section 04</span><h1 class="page">Glossary</h1>'+
+      '<p class="lead">The working vocabulary of venture finance \u2014 deal terms, fund economics, instruments, and the metrics LPs judge you by.</p>'+
+      '<input class="search" id="gsearch" placeholder="Search terms or definitions\u2026" value="'+gQuery.replace(/"/g,"&quot;")+'">'+
+      '<div class="gfilter" style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px">'+cats.map(function(c){return '<button data-c="'+c+'" class="'+(c===gCat?"on":"")+'">'+c+'</button>';}).join("")+'</div>'+
+      '<div class="gcount" id="gcount"></div><div id="glist"></div>';
+    var s=document.getElementById("gsearch");
+    s.addEventListener("input",function(){ gQuery=this.value; paintGloss(); });
+    document.querySelector(".gfilter").addEventListener("click",function(e){ if(e.target.tagName==="BUTTON"){ gCat=e.target.getAttribute("data-c"); renderGlossary(); }});
+    paintGloss();
+    function paintGloss(){
+      var q=gQuery.trim().toLowerCase();
+      var list=DATA.glossary.filter(function(t){
+        if(gCat!=="All" && t.c!==gCat) return false;
+        if(!q) return true;
+        return (t.t+" "+t.d).toLowerCase().indexOf(q)>=0;
+      }).sort(function(a,b){return a.t.localeCompare(b.t);});
+      document.getElementById("gcount").textContent = list.length+" term"+(list.length===1?"":"s");
+      document.getElementById("glist").innerHTML = list.map(function(t){
+        return '<div class="gterm"><span class="t">'+t.t+'</span><span class="cat">'+t.c+'</span><div class="d">'+t.d+'</div></div>';
+      }).join("") || '<p class="muted">No matching terms.</p>';
+    }
+  }
+
+  /* ---------- ROLODEX ---------- */
+  var rRole="All";
+  function renderRolodex(){
+    var roles=["All","Investor","Founder","Both","Author"];
+    view.innerHTML =
+      '<span class="kicker">Section 05</span><h1 class="page">The Rolodex</h1>'+
+      '<p class="lead">Names that recur across the canon \u2014 the people whose firms, companies, and bets you should be able to place on sight.</p>'+
+      '<div class="rfilter" style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 18px">'+roles.map(function(r){return '<button data-r="'+r+'" class="'+(r===rRole?"on":"")+'">'+r+'</button>';}).join("")+'</div>'+
+      '<div class="rgrid" id="rgrid"></div>';
+    document.querySelector(".rfilter").addEventListener("click",function(e){ if(e.target.tagName==="BUTTON"){ rRole=e.target.getAttribute("data-r"); renderRolodex(); }});
+    var list=DATA.people.filter(function(p){ return rRole==="All"||p.role===rRole; });
+    var hasBook=function(s){ return DATA.books.some(function(b){return b.slug===s;}); };
+    document.getElementById("rgrid").innerHTML=list.map(function(p){
+      var x=[];
+      if(p.book && hasBook(p.book)) x.push('<a class="xlink" href="#/book/'+p.book+'">Read the summary \u2192</a>');
+      if(p.tl) x.push('<a class="xlink xtl" data-tl="'+p.tl+'">See in timeline \u2192</a>');
+      var xrow=x.length? '<div class="xrow">'+x.join("")+'</div>':'';
+      return '<div class="rcard"><div class="nm">'+p.nm+'</div><div class="rl"><b>'+p.role+'</b> \u00b7 '+p.firm+'</div><span class="era">'+p.era+'</span><div class="wh" style="margin-top:8px">'+p.wh+'</div>'+xrow+'</div>';
+    }).join("");
+    document.getElementById("rgrid").addEventListener("click",function(e){
+      var a=e.target&&e.target.closest?e.target.closest(".xtl"):null;
+      if(a){ e.preventDefault(); pendingTLScroll=a.getAttribute("data-tl"); tlActive="ALL"; location.hash="#/timeline"; }
+    });
+  }
+
+  /* ---------- FLASHCARDS (Leitner SRS) ---------- */
+  var fcDeck="all", fcMode="study", session=null;
+  function dueCards(deck){ var now=Date.now(); return CARDS.filter(function(c){ return (deck==="all"||c.deck===deck) && cardState(c.id).due<=now; }); }
+  function deckCards(deck){ return CARDS.filter(function(c){ return deck==="all"||c.deck===deck; }); }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function renderFlashcards(){
+    var decks=decksWithCards();
+    var all=deckCards(fcDeck), due=dueCards(fcDeck);
+    var learning=0,mastered=0;
+    all.forEach(function(c){ var b=cardState(c.id).box; if(b>=4) mastered++; else learning++; });
+    var pickers='<button data-d="all" class="'+(fcDeck==="all"?"on":"")+'">All Decks</button>'+
+      decks.map(function(d){return '<button data-d="'+d+'" class="'+(fcDeck===d?"on":"")+'">'+deckLabel(d)+'</button>';}).join("");
+    view.innerHTML=
+      '<span class="kicker">Section 03</span><h1 class="page">Flashcards</h1>'+
+      '<p class="lead">Spaced repetition on a five-box Leitner schedule. Reversible cards test you both ways \u2014 term to definition and back. Switch to <span class="hl">Browse</span> to scan a whole deck at once.</p>'+
+      '<div class="deckpick" id="dpick">'+pickers+'</div>'+
+      '<div class="modetoggle" id="mtoggle"><button data-m="study" class="'+(fcMode==="study"?"on":"")+'">Study</button><button data-m="browse" class="'+(fcMode==="browse"?"on":"")+'">Browse</button></div>'+
+      '<div class="fc-stats">'+
+        '<div class="stat"><div class="num">'+due.length+'</div><div class="lb">Due Now</div></div>'+
+        '<div class="stat"><div class="num">'+learning+'</div><div class="lb">Learning</div></div>'+
+        '<div class="stat"><div class="num">'+mastered+'</div><div class="lb">Mastered</div></div>'+
+        '<div class="stat"><div class="num">'+all.length+'</div><div class="lb">Total</div></div>'+
+      '</div>'+
+      '<div id="fcarea"></div>'+
+      '<p class="note">How it works: a correct answer moves a card up a box and pushes its next review further out (1 \u2192 3 \u2192 7 \u2192 16 \u2192 35 days); a miss sends it back to the start. Your progress is saved automatically in this browser. <a href="#" id="resetbtn">Reset this deck</a>.</p>';
+    document.getElementById("dpick").addEventListener("click",function(e){ if(e.target.tagName==="BUTTON"){ fcDeck=e.target.getAttribute("data-d"); session=null; renderFlashcards(); }});
+    document.getElementById("mtoggle").addEventListener("click",function(e){ if(e.target.tagName==="BUTTON"){ fcMode=e.target.getAttribute("data-m"); session=null; renderFlashcards(); }});
+    document.getElementById("resetbtn").addEventListener("click",function(e){ e.preventDefault();
+      if(confirm("Reset spaced-repetition progress for "+(fcDeck==="all"?"all decks":deckLabel(fcDeck))+"?")){
+        deckCards(fcDeck).forEach(function(c){ try{ if(canLS) localStorage.removeItem(SRS_PREFIX+c.id); else delete mem[SRS_PREFIX+c.id]; }catch(err){} });
+        session=null; renderFlashcards();
+      }
+    });
+    if(fcMode==="browse") paintBrowse(); else paintArea();
+  }
+
+  function paintBrowse(){
+    var area=document.getElementById("fcarea");
+    var src=DATA.flashcards.filter(function(c){ return fcDeck==="all"||c.deck===fcDeck; });
+    var groups={}, order=[];
+    src.forEach(function(c){ if(!groups[c.deck]){ groups[c.deck]=[]; order.push(c.deck); } groups[c.deck].push(c); });
+    var html=order.map(function(d){
+      var hdr = fcDeck==="all" ? '<div class="browse-deckhdr">'+deckLabel(d)+' \u00b7 '+groups[d].length+' cards</div>' : '';
+      return hdr + groups[d].map(function(c){
+        return '<div class="bcard"><div class="bq">'+c.front+'</div><div class="ba">'+c.back+'</div><div class="bm">'+(c.rev?"Reversible \u00b7 term \u2194 definition":"Concept card")+'</div></div>';
+      }).join("");
+    }).join("");
+    area.innerHTML='<div class="browse">'+(html||'<p class="muted">No cards in this deck.</p>')+'</div>';
+  }
+
+  function startSession(useAll){
+    var pool = useAll ? deckCards(fcDeck) : dueCards(fcDeck);
+    session={ queue:shuffle(pool), idx:0, flipped:false, total:pool.length, correct:0, requeued:{} };
+  }
+  function paintArea(){
+    var area=document.getElementById("fcarea");
+    var due=dueCards(fcDeck);
+    if(!session){
+      if(!due.length){
+        area.innerHTML='<div class="fc-done"><h3 style="margin-top:0">Nothing due right now.</h3><p class="muted" style="max-width:none">You\u2019re caught up on this deck. Come back later, or run a full review to study every card anyway.</p><button class="btn" id="studyall">Study all cards</button></div>';
+        document.getElementById("studyall").addEventListener("click",function(){ startSession(true); paintArea(); });
+      } else {
+        area.innerHTML='<div class="fc-done"><h3 style="margin-top:0">'+due.length+' card'+(due.length===1?"":"s")+' ready.</h3><p class="muted" style="max-width:none">Begin a focused review of everything due in this deck.</p><button class="btn" id="startbtn">Start review</button></div>';
+        document.getElementById("startbtn").addEventListener("click",function(){ startSession(false); paintArea(); });
+      }
+      return;
+    }
+    if(session.idx>=session.queue.length){
+      area.innerHTML='<div class="fc-done"><h3 style="margin-top:0">Session complete.</h3><p class="muted" style="max-width:none">'+session.correct+' of '+session.total+' marked correct. Cards you missed are scheduled to return; mastered cards space out further.</p><button class="btn" id="again">Back to deck</button></div>';
+      document.getElementById("again").addEventListener("click",function(){ session=null; renderFlashcards(); });
+      return;
+    }
+    var c=session.queue[session.idx];
+    var done=session.idx, tot=session.queue.length;
+    area.innerHTML=
+      '<div class="progress"><div class="bar" style="width:'+Math.round(done/tot*100)+'%"></div></div>'+
+      '<div class="card-stage"><div class="flashcard'+(session.flipped?" flipped":"")+'" id="fcard">'+
+        '<div class="face front"><span class="side">'+c.dir.split(" \u2192 ")[0]+'</span><div class="content'+(c.prompt.length>90?" small":"")+'">'+c.prompt+'</div><span class="hint">click to reveal</span><span class="deck">'+deckLabel(c.deck)+'</span></div>'+
+        '<div class="face back"><span class="side">'+(c.dir==="Concept"?"Answer":c.dir.split(" \u2192 ")[1])+'</span><div class="content'+(c.answer.length>90?" small":"")+'">'+c.answer+'</div><span class="deck">'+deckLabel(c.deck)+'</span></div>'+
+      '</div></div>'+
+      (session.flipped ?
+        '<div class="grade"><button class="miss" id="gmiss">Missed it</button><button class="got" id="ggot">Got it</button></div>' :
+        '<div class="grade"><button class="got" id="reveal" style="flex:1">Reveal answer</button></div>');
+    var cardEl=document.getElementById("fcard");
+    cardEl.addEventListener("click",function(){ if(!session.flipped){ session.flipped=true; paintArea(); } });
+    if(!session.flipped){ document.getElementById("reveal").addEventListener("click",function(e){e.stopPropagation(); session.flipped=true; paintArea();}); }
+    else {
+      document.getElementById("ggot").addEventListener("click",function(){ grade(c,true); });
+      document.getElementById("gmiss").addEventListener("click",function(){ grade(c,false); });
+    }
+  }
+  function grade(c,correct){
+    var st=cardState(c.id);
+    if(correct){ st.box=Math.min(st.box+1,5); st.due=Date.now()+INTERVALS[st.box]; session.correct++; }
+    else { st.box=1; st.due=Date.now();
+      if(!session.requeued[c.id]){ session.requeued[c.id]=1; session.queue.push(c); }
+    }
+    saveCard(c.id,st);
+    session.idx++; session.flipped=false; paintArea();
+  }
+
+  /* keyboard: space flips, arrows grade */
+  document.addEventListener("keydown",function(e){
+    if((location.hash||"").indexOf("flashcards")<0 || !session) return;
+    if(session.idx>=session.queue.length) return;
+    if(e.code==="Space"){ e.preventDefault(); if(!session.flipped){session.flipped=true;paintArea();} }
+    else if(session.flipped && (e.key==="ArrowRight"||e.key==="1")){ grade(session.queue[session.idx],true); }
+    else if(session.flipped && (e.key==="ArrowLeft"||e.key==="2")){ grade(session.queue[session.idx],false); }
+  });
+
+  window.addEventListener("hashchange",go);
+  go();
+})();
+</script>
+</body>
+</html>
